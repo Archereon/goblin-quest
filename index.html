@@ -1,0 +1,619 @@
+<!DOCTYPE HTML>
+<!--
+	Indivisible by Pixelarity
+	pixelarity.com | hello@pixelarity.com
+	License: pixelarity.com/license
+	
+This is an RPG about goblins going on a quest. The quest is divided into 9 pre-defined stages. 
+Each stage has a certain amount of "health". 
+Once the stage reaches zero hit points, the players win and move on to the next stage. 
+At the end of the 9th stage, if there are still goblins, the goblins win! 
+If all goblins die, they lose! 
+
+When a goblin takes an action, they roll a 6-sided die.
+
+If they roll: 
+6 - Great success! Subtract 2 from the stage health
+5 - Success! Subtract 1 from the stage health
+4 - Something good! The next player can roll an extra die (advantage)
+3 - Nothing
+2 - Something bad! The next player gets -1 to their first roll (disadvantage)
+1 - INSTANT DEATH! Your Goblin dies and your turn ends. 
+
+A player can choose to roll the die again for each extertise, heirloom, feature, or dream they use in their action. 
+
+Each player controls 5 goblins. They all have the same extertise, heirloom, feature, and dream. However, those traits are randomly assigned to all of their goblins once they connect. 
+
+The backend is 2 different lambda URLs with a dynamodb keeping the game state. 
+One lambda URL is for pushing actions to. The other one is simply to periodically retrieve the game data. 
+On a player's turn, they submit some action (either text or a roll). 
+We display that text (as well as all previously submitted text) in a text box on the screen. 
+After their action, they receive how many rolls they are allowed from the backend. 
+Then they can submit rolls, one at a time, or end their turn. 
+Then we display the results of the roll on the screen. 
+Once all the dice rolls are done, or the player ends their turn, the player must narrate what happened. 
+Then the games waits for the player to submit more text, narrating what happened. 
+
+
+These are the actions a player can send into the backend:
+connect
+    Just a request for connection with their player_id
+describe
+    Text
+roll
+    True if they want to roll again, False if they want to stop. They need to roll at least once. 
+-->
+<html>
+	<head>
+		<title>Goblin Quest</title>
+		<meta name="keywords" content="goblins" />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap">
+
+	</head>
+	<body class="is-preload-0 is-preload-1">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+					
+					<article id="RoomConnect" class="panel special">
+					    <section>
+						<header>
+							<h3>Gather your goblins!</h3>
+						</header>
+						<div id="roomInput">
+							<input type="text" id="room_id" maxlength="4" placeholder="Enter Room">
+						</div>
+						<div id="playerIDInput">
+							<input type="text" id="player_id" placeholder="Enter Name">
+						</div>
+						<nav id="nav">
+							<ul class="actions stacked special animated spinY">
+								<li><a class="button" id="Connect">Connect</a></li>
+							</ul>
+						</nav>
+						</section>
+						
+					</article>
+					<article id="MainRoom" class="panel special"
+							style="
+							display: flex; 
+							flex-direction: row; 
+							gap: 1em; 
+							justify-content: space-between;
+							align-items: flex-start;
+							padding: 1em;
+						">
+						<!-- LEFT COLUMN -->
+				<div id="left-column" style="flex: 1; display: flex; flex-direction: column; gap: 1em;">
+					
+
+					<!-- Stage Health -->
+					<div>
+						<h3>Stage Health</h3>
+						<img 
+							id="stageHealthImage" 
+							src="images/heart_100_percent.png" 
+							alt="Stage Health" 
+							style="max-width: 150px; height: auto;"
+						/>
+					</div>
+
+					<!-- Player Data Table (vertical orientation) -->
+					<div>
+						<h3>Your Goblin</h3>
+						<table 
+							id="playerDataTable" 
+							style="
+								margin: 0 auto; 
+								border: 1px solid #ccc; 
+								border-collapse: collapse;
+							"
+						>
+							<tbody id="playerDataTableBody">
+								<!-- Will be dynamically populated in JS -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+				<!-- MIDDLE COLUMN -->
+				<div 
+					id="middle-column" 
+					style="
+						flex: 2; 
+						display: flex; 
+						flex-direction: column;
+						gap: 1em;
+					"
+				>
+					<!-- Game Story -->
+					<div style="flex: 1; display: flex; flex-direction: column;">
+						<h3>Game Story</h3>
+						<!-- Stage Label -->
+						<div 
+							id="stageLabelContainer" 
+							style="
+								border: 1px solid #ccc; 
+								padding: 0.5em; 
+								background-color: #2f3021; 
+								color: #ececec;
+								text-align: center; 
+								font-weight: bold;
+							"
+						>
+							<span id="stageLabel">Stage: ???</span>
+						</div>
+						<div 
+							id="gameStory"
+							style="
+								border: 1px solid #ccc;
+								overflow-y: auto;
+								padding: 1em;
+								background-color: #2f3021; 
+								color: #ececec;   
+								border: 2px dashed #4f4c2a;
+								height: calc(100vh - 400px); /* Adjust 100px to fit your layout */;
+							"
+						></div>
+					</div>
+					
+					<!-- Actions (input, roll, end turn, etc.) -->
+					<div 
+						class="actions" 
+						style="
+							display: flex; 
+							flex-direction: column; 
+							border: 1px solid #ccc;
+							padding: 1em;
+							background-color: #2f3021;
+						"
+					>
+						<input type="text" id="descriptionInput" maxlength="200" placeholder="Describe something..." />
+						<ul class="actions special" style="margin-top: 1em;">
+							<li><a class="button" id="rollButton">Roll Dice</a></li>
+							<li><a class="button" id="endTurnButton">Retreat!</a></li>
+							<li><a class="button" id="useAIButton">Write for me!</a></li>
+							<li><a class="button" id="submitTextButton">Tell The Tale!</a></li>
+						</ul>
+						<div id="instructionsBox" style="margin-top: 0.5em; font-weight: bold;">
+							Hello
+						</div>
+					</div>
+				</div>
+				
+				<!-- RIGHT COLUMN -->
+				<div id="right-column" style="flex: 1; display: flex; flex-direction: column;">
+					<h3>Goblin Gossip</h3>
+					<div 
+						id="gameLog" 
+						style="
+							border: 1px solid #ccc;
+							overflow-y: auto;
+							padding: 1em;
+							background-color: #2f3021; 
+							color: #ececec;   
+							border: 2px dashed #4f4c2a;
+							height: calc(100vh - 400px); /* Adjust 100px to fit your layout */
+						"
+					></div>
+					<!-- Dice image -->
+					<div>
+						<img 
+							id="diceImage" 
+							src="images/dice_1.png" 
+							alt="Dice" 
+							style="max-width: 150px; height: auto;"
+						/>
+
+						<div id="diceModifierBox" style="margin-top: 0.5em; font-weight: bold;">
+							Die Mod: <span id="diceModifierValue"></span>
+						</div>
+					</div>
+				</div>
+					</article>
+										
+			</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/web-animations-js@2.3.2/web-animations.min.js"></script>
+		<script>
+			// Your Lambda URL
+			const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/'; 
+			const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/'; 
+	
+			// Function to fetch the latest roll result from the Lambda URL
+			function fetchPlayerUpdate(room_id, player_id) {
+				fetch(`${pullLambdaUrl}?room_id=${room_id}`)
+					.then(response => {
+						if (!response.ok) {
+							// If the response is not OK, throw an error (this will skip the next .then block)
+							throw new Error(`HTTP error! Status: ${response.status}`);
+						}
+						return response.json();
+					})
+					.then(data => {
+						// 'data' contains the state of the game. Here is an example of what it looks like:
+						//{  
+						//  'room_id': 'ABCD',
+						//  'player_data':
+						//    {player_id_1: 
+						//      {
+						//       "health": 5,
+						//       "expertise": "Sharpshooter",
+						//       "heirloom": "Grandma's Spoon",
+						//       "feature": "Scar on left eye",
+						//       "dream": "Find the lost treasure"
+						//      },
+						//     player_id_2:
+						//      {
+						//       "health": 5,
+						//       "expertise": "Sharpshooter",
+						//       "heirloom": "Grandma's Spoon",
+						//       "feature": "Scar on left eye",
+						//       "dream": "Find the lost treasure"
+						//      },
+						//    },
+						//    'modifier': 'NONE',
+						//    'stage_health': 5,
+						// 	  'stage_max_health': 5,
+						//    'number_of_rolls_remaining': 0,
+						//    'turn_order': [player_id_1, player_id_2],
+						//    'current_turn_index': 0,
+						//    'game_state': 'WAITING_FOR_NEXT_ACTION',
+						//    'game_stage': 1,
+						//    'most_recent_roll': 1,
+						//    'game_log': ['lots of text here', 'lots of text here'],
+						//    'game_story': ['lots of text here too', 'even more text here'],
+						//    'turn_results': ['something good', 'goblin died'],
+						//    'prompts': ['prompt 1', 'prompt 2', 'etc']
+						//}
+						
+						// Update all the screens
+						
+						// ============================
+						// Update the dice roll image
+						// ============================
+						if (data.most_recent_roll) {
+							const diceImage = document.getElementById('diceImage');
+							diceImage.src = `images/dice_${data.most_recent_roll}.png`;
+							console.log(`images/dice_${data.most_recent_roll}.png`)
+						}
+						
+						// ============================
+						// Update the dice modifier
+						// ============================
+						if (data.modifier) {
+							const diceModifierValue = document.getElementById('diceModifierValue');
+							diceModifierValue.textContent = data.modifier;
+						} else {
+							// If there's no modifier, show something like NONE or leave it blank
+							document.getElementById('diceModifierValue').textContent = 'NONE';
+						}
+												
+												
+						// ======================================
+						// Update the player's data table
+						// ======================================
+						const currentPlayer = data.player_data[player_id];
+						if (currentPlayer) {
+						  const tableBody = document.getElementById('playerDataTableBody');
+						  tableBody.innerHTML = '';
+
+						  // Build the "Health" row with tiny goblin icons
+						  const healthRow = document.createElement('tr');
+						  const healthCellHTML = [];
+
+						  // We assume the player always has 5 goblins total.
+						  // For each goblin slot (0 to 4), decide if it's alive or dead
+						  for (let i = 0; i < 5; i++) {
+							if (i < currentPlayer.health) {
+							  // Goblin is alive
+							  healthCellHTML.push(`
+								<img 
+								  src="images/alive_goblin.png" 
+								  alt="Alive Goblin" 
+								  style="width:24px; vertical-align:middle; margin-right:4px;"
+								/>
+							  `);
+							} else {
+							  // Goblin is dead
+							  healthCellHTML.push(`
+								<img 
+								  src="images/dead_goblin.png" 
+								  alt="Dead Goblin" 
+								  style="width:24px; vertical-align:middle; margin-right:4px;"
+								/>
+							  `);
+							}
+						  }
+
+						  healthRow.innerHTML = `
+							<th style="padding: 0.5em;">Health</th>
+							<td style="padding: 0.5em;">${healthCellHTML.join('')}</td>
+						  `;
+						  tableBody.appendChild(healthRow);
+
+						  // Build and append the other rows: Expertise, Heirloom, Feature, Dream
+						  const rows = [
+							{ label: "Expertise", value: currentPlayer.expertise },
+							{ label: "Heirloom",  value: currentPlayer.heirloom },
+							{ label: "Feature",   value: currentPlayer.feature },
+							{ label: "Dream",     value: currentPlayer.dream },
+						  ];
+
+						  rows.forEach(rowData => {
+							const row = document.createElement('tr');
+							row.innerHTML = `
+							  <th style="padding: 0.5em;">${rowData.label}</th>
+							  <td style="padding: 0.5em;">${rowData.value}</td>
+							`;
+							tableBody.appendChild(row);
+						  });
+						}
+
+						
+						// =================================
+						// Update the Stage Health Image
+						// =================================
+						if (typeof data.stage_health === 'number' && typeof data.stage_max_health === 'number') {
+							// Calculate ratio
+							const ratio = data.stage_health / data.stage_max_health;
+							let heartImageName = '';
+
+							if (ratio <= 0) {
+								heartImageName = 'heart_0_percent.png';
+							} else if (ratio <= 0.25) {
+								heartImageName = 'heart_25_percent.png';
+							} else if (ratio <= 0.50) {
+								heartImageName = 'heart_50_percent.png';
+							} else if (ratio <= 0.75) {
+								heartImageName = 'heart_75_percent.png';
+							} else {
+								heartImageName = 'heart_100_percent.png';
+							}
+
+							// Set the image source
+							const stageHealthImage = document.getElementById('stageHealthImage');
+							stageHealthImage.src = `images/${heartImageName}`;
+						}
+						
+						// Update the game log
+						if (data.game_log) {
+							const gameLogContainer = document.getElementById('gameLog');
+							gameLogContainer.innerText = data.game_log.join('\n\n');
+						}
+						
+						// Update the game story
+						if (data.game_story) {
+							const gameStoryContainer = document.getElementById('gameStory');
+							gameStoryContainer.innerText = data.game_story.join('\n\n');
+						}
+						
+						// Update the stage label
+						if (data.prompts && typeof data.game_stage !== 'undefined') {
+							const stageLabel = document.getElementById('stageLabel');
+							// Ensure we have a prompt for this game_stage
+							if (data.prompts[data.game_stage]) {
+								stageLabel.textContent = `Stage: ${data.prompts[data.game_stage]}`;
+							} else {
+								stageLabel.textContent = `Stage: Unknown`;
+							}
+						}
+						
+						// ==========================
+						// Show or hide action buttons
+						// ==========================
+						const rollButton = document.getElementById('rollButton');
+						const endTurnButton = document.getElementById('endTurnButton');
+						const submitTextButton = document.getElementById('submitTextButton');
+						const useAIButton = document.getElementById('useAIButton');
+						const instructionsBox = document.getElementById('instructionsBox');
+						if (data.turn_order && data.turn_order[data.current_turn_index] === player_id) {
+						    if (data.game_state=='WAITING_FOR_FIRST_ROLL' || data.game_state=='WAITING_FOR_ROLL' ) {
+								// It's this player's turn -> show the buttons
+								rollButton.style.display = 'inline-block';
+								endTurnButton.style.display = 'inline-block';
+								submitTextButton.style.display = 'none';
+								useAIButton.style.display = 'none';
+								instructionsBox.textContent = 'Roll the dice, or end your turn early! Rolls remaining: ' + data.number_of_rolls_remaining;
+								}
+							else if (data.game_state=='WAITING_FOR_ACTION_TEXT'){
+							    rollButton.style.display = 'none';
+							    endTurnButton.style.display = 'none';
+								useAIButton.style.display = 'none';
+								submitTextButton.style.display = 'inline-block';
+								instructionsBox.textContent = 'Your turn! Write what you want to do.';
+								}
+							else if (data.game_state=='WAITING_FOR_POST_ROLL_NARRATION') {
+								rollButton.style.display = 'none';
+							    endTurnButton.style.display = 'none';
+								useAIButton.style.display = 'none';
+								submitTextButton.style.display = 'inline-block';
+								instructionsBox.textContent = 'Your turn is over! Narrate what happened on your turn! As a reminder: ' + data.turn_results.join(", ");
+							    }
+							else if (data.game_state=='PROCESSING') {
+								rollButton.style.display = 'none';
+							    endTurnButton.style.display = 'none';
+								useAIButton.style.display = 'none';
+								submitTextButton.style.display = 'none';
+							    instructionsBox.textContent = 'Processing previous turn....';
+								}
+							else {
+								rollButton.style.display = 'none';
+								endTurnButton.style.display = 'none';
+								submitTextButton.style.display = 'none';
+								useAIButton.style.display = 'none';
+								
+							}
+						} else {
+							// It's not this player's turn -> hide the buttons
+							rollButton.style.display = 'none';
+							endTurnButton.style.display = 'none';
+							submitTextButton.style.display = 'none';
+							useAIButton.style.display = 'none';
+							instructionsBox.textContent = "Waiting for other player's turn: " + data.turn_order[data.current_turn_index];
+						}
+						
+					})
+					.catch(error => {
+						// Log or handle the error here; the table update will not happen
+						console.error('No player data to update right now');
+					});
+
+								}
+	
+			document.getElementById('Connect').onclick = function() {
+				document.getElementById('rollButton').style.display='none';
+				document.getElementById('endTurnButton').style.display='none';
+				document.getElementById('submitTextButton').style.display='none';
+				const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
+				const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
+				if (enteredRoomID) {
+					localStorage.setItem('enteredRoomID', enteredRoomID);
+					localStorage.setItem('enteredPlayerID', enteredPlayerID);
+					
+					if (enteredRoomID) {
+					fetch(pushLambdaUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							"action_type": "connect",
+							"room_id": enteredRoomID,
+							"player_id": enteredPlayerID,
+							"data": "True"
+
+						}),
+					})
+					.then(response => response.json())
+					.then(data => console.log('Success:', data))
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+				}
+
+				// Start polling for the roll result
+				setInterval(() => fetchPlayerUpdate(enteredRoomID, enteredPlayerID), 1000);
+
+				// Fetch the latest roll immediately on page load
+				fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
+				
+				// Navigate to MainRoom when data is successfully retrieved
+				window.location.href = "#MainRoom"; 
+			} 
+			else {
+				document.getElementById('error').style.display = 'block';
+			}
+			};
+	
+			document.getElementById('rollButton').onclick = function() {
+				document.getElementById('rollButton').style.display='none';
+				document.getElementById('endTurnButton').style.display='none';
+				document.getElementById('submitTextButton').style.display='none';
+				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+				if (storedRoomID) {
+					fetch(pushLambdaUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							"action_type": "roll",
+							"room_id": storedRoomID,
+							"player_id": storedPlayerID,
+							"data": "True"
+
+						}),
+					})
+					.then(response => response.json())
+					.then(data => console.log('Success:', data))
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+				}
+			};
+			
+			document.getElementById('endTurnButton').onclick = function() {
+			    document.getElementById('rollButton').style.display='none';
+				document.getElementById('endTurnButton').style.display='none';
+				document.getElementById('submitTextButton').style.display='none';
+				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+				if (storedRoomID) {
+					fetch(pushLambdaUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							"action_type": "roll",
+							"room_id": storedRoomID,
+							"player_id": storedPlayerID,
+							"data": "False"
+
+						}),
+					})
+					.then(response => response.json())
+					.then(data => console.log('Success:', data))
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+				}
+			};
+
+			document.getElementById('submitTextButton').onclick = function() {
+			    document.getElementById('rollButton').style.display='none';
+				document.getElementById('endTurnButton').style.display='none';
+				document.getElementById('submitTextButton').style.display='none';
+				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+
+				const description = document.getElementById('descriptionInput').value;
+
+				if (storedRoomID) {
+					document.getElementById('descriptionInput').value = '';
+					fetch(pushLambdaUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							"action_type": "describe",
+							"room_id": storedRoomID,
+							"player_id": storedPlayerID,
+							"data": description
+
+						}),
+					})
+					.then(response => response.json())
+					.then(data => {
+						console.log('Success:', data);
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+				}
+			};
+			
+			const descriptionInput = document.getElementById('descriptionInput');
+	        descriptionInput.addEventListener('input', function() {
+			if (this.value.length > 200) {
+			  this.value = this.value.substring(0, 200);
+			   }
+		    });
+		</script>
+
+	</body>
+</html>
