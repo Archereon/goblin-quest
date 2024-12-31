@@ -118,6 +118,15 @@ roll
 								<!-- Will be dynamically populated in JS -->
 							</tbody>
 						</table>
+						<!-- Goblin image (256x256) -->
+						<div style="text-align: center; margin-top: 1em;">
+							<img 
+								id="playerGoblinImage" 
+								src="images/default_goblin.png" 
+								alt="Goblin Image" 
+								style="width: 256px; height: 256px;"
+							/>
+						</div>
 					</div>
 				</div>
 				
@@ -260,7 +269,8 @@ roll
 						//       "expertise": "Sharpshooter",
 						//       "heirloom": "Grandma's Spoon",
 						//       "feature": "Scar on left eye",
-						//       "dream": "Find the lost treasure"
+						//       "dream": "Find the lost treasure",
+						//       "image": "image_url"
 						//      },
 						//    },
 						//    'modifier': 'NONE',
@@ -360,7 +370,9 @@ roll
 							tableBody.appendChild(row);
 						  });
 						}
-
+						if (currentPlayer.image) {
+							document.getElementById('playerGoblinImage').src = currentPlayer.image;
+						}
 						
 						// =================================
 						// Update the Stage Health Image
