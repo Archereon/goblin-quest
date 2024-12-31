@@ -79,9 +79,29 @@ roll
 						</section>
 						
 					</article>
+
+					<!-- Loading Overlay -->
+					<div id="loadingOverlay" 
+					style="
+					position: fixed; 
+					top: 0; 
+					left: 0; 
+					width: 100vw; 
+					height: 100vh; 
+					background: #2f3021; 
+					color: #ececec; 
+					display: flex; 
+					align-items: center; 
+					justify-content: center; 
+					font-size: 3em;
+					z-index: 9999;
+					">
+					LOADING...
+					</div>
+					
 					<article id="MainRoom" class="panel special"
 							style="
-							display: flex; 
+							display: none; 
 							flex-direction: row; 
 							gap: 1em; 
 							justify-content: space-between;
@@ -242,6 +262,7 @@ roll
 			const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/'; 
 	
 			// Function to fetch the latest roll result from the Lambda URL
+			let firstSuccessfulFetch = true;
 			function fetchPlayerUpdate(room_id, player_id) {
 				fetch(`${pullLambdaUrl}?room_id=${room_id}`)
 					.then(response => {
@@ -290,7 +311,13 @@ roll
 						//}
 						
 						// Update all the screens
-						
+						// If this is the first successful fetch, hide loading overlay and show the main room
+						if (firstSuccessfulFetch) {
+							document.getElementById('loadingOverlay').style.display = 'none';
+							document.getElementById('MainRoom').style.display = 'flex';
+							firstSuccessfulFetch = false;
+						}
+
 						// ============================
 						// Update the dice roll image
 						// ============================
