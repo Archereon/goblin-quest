@@ -340,9 +340,8 @@ roll
 						if (currentPlayer) {
 							// If this is the first successful fetch, hide loading overlay and show the main room
 						  if (firstSuccessfulFetch) {
-							console.log("HOWDYDOOOOO")
 							window.location.href = "#MainRoom"; 
-							firstSuccessfulFetch = False;
+							firstSuccessfulFetch = false;
 						  }
 						  const tableBody = document.getElementById('playerDataTableBody');
 						  tableBody.innerHTML = '';
