@@ -79,29 +79,30 @@ roll
 						</section>
 						
 					</article>
-
-					<!-- Loading Overlay -->
-					<div id="loadingOverlay" 
-					style="
-					position: fixed; 
-					top: 0; 
-					left: 0; 
-					width: 100vw; 
-					height: 100vh; 
-					background: #2f3021; 
-					color: #ececec; 
-					display: flex; 
-					align-items: center; 
-					justify-content: center; 
-					font-size: 3em;
-					z-index: 9999;
-					">
-					LOADING...
-					</div>
+					<article id="LoadingScreen" class="panel special">
+						<!-- Loading Overlay -->
+						<div id="loadingOverlay" 
+						style="
+						position: fixed; 
+						top: 0; 
+						left: 0; 
+						width: 100vw; 
+						height: 100vh; 
+						background: #2f3021; 
+						color: #ececec; 
+						display: flex; 
+						align-items: center; 
+						justify-content: center; 
+						font-size: 3em;
+						z-index: 9999;
+						">
+						LOADING...
+						</div>
+					</article>
 					
 					<article id="MainRoom" class="panel special"
 							style="
-							display: none; 
+							display: flex; 
 							flex-direction: row; 
 							gap: 1em; 
 							justify-content: space-between;
@@ -311,12 +312,6 @@ roll
 						//}
 						
 						// Update all the screens
-						// If this is the first successful fetch, hide loading overlay and show the main room
-						if (firstSuccessfulFetch) {
-							document.getElementById('loadingOverlay').style.display = 'none';
-							document.getElementById('MainRoom').style.display = 'flex';
-							firstSuccessfulFetch = false;
-						}
 
 						// ============================
 						// Update the dice roll image
@@ -343,6 +338,11 @@ roll
 						// ======================================
 						const currentPlayer = data.player_data[player_id];
 						if (currentPlayer) {
+							// If this is the first successful fetch, hide loading overlay and show the main room
+						  if (firstSuccessfulFetch) {
+							window.location.href = "#MainRoom"; 
+							firstSuccessfulFetch = False;
+						  }
 						  const tableBody = document.getElementById('playerDataTableBody');
 						  tableBody.innerHTML = '';
 
@@ -548,8 +548,8 @@ roll
 				// Fetch the latest roll immediately on page load
 				fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
 				
-				// Navigate to MainRoom when data is successfully retrieved
-				window.location.href = "#MainRoom"; 
+				// Navigate to Loading Screen
+				window.location.href = "#Loading"; 
 			} 
 			else {
 				document.getElementById('error').style.display = 'block';
