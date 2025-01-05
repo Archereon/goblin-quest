@@ -430,12 +430,14 @@ roll
 						if (data.game_log) {
 							const gameLogContainer = document.getElementById('gameLog');
 							gameLogContainer.innerText = data.game_log.join('\n\n');
+							gameLogContainer.scrollTop = gameLogContainer.scrollHeight;
 						}
 						
 						// Update the game story
 						if (data.game_story) {
 							const gameStoryContainer = document.getElementById('gameStory');
 							gameStoryContainer.innerText = data.game_story.join('\n\n');
+							gameStoryContainer.scrollTop = gameStoryContainer.scrollHeight;
 						}
 						
 						// Update the stage label
@@ -509,7 +511,7 @@ roll
 						console.error('No player data to update right now');
 					});
 
-								}
+						}
 	
 			document.getElementById('Connect').onclick = function() {
 				document.getElementById('rollButton').style.display='none';
