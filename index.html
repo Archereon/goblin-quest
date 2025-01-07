@@ -43,8 +43,8 @@ describe
 roll
     True if they want to roll again, False if they want to stop. They need to roll at least once. 
 -->
-<html>
-	<head>
+<html lang="en">
+    <head>
 		<title>Goblin Quest</title>
 		<meta name="keywords" content="goblins" />
 		<meta charset="utf-8" />
@@ -55,9 +55,13 @@ roll
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap">
 
 	</head>
-	<body class="is-preload-0 is-preload-1">
+  <body class="is-preload-0 is-preload-1">
 
-		<!-- Wrapper -->
+    <div>
+      <button id="rollem">Roll em!</button>
+    </div>
+    <div id="dice-box"></div>
+	<!-- Wrapper -->
 			<div id="wrapper">
 					
 					<article id="RoomConnect" class="panel special">
@@ -79,26 +83,7 @@ roll
 						</section>
 						
 					</article>
-					<article id="LoadingScreen" class="panel special">
-						<!-- Loading Overlay -->
-						<div id="loadingOverlay" 
-						style="
-						position: fixed; 
-						top: 0; 
-						left: 0; 
-						width: 100vw; 
-						height: 100vh; 
-						background: #2f3021; 
-						color: #ececec; 
-						display: flex; 
-						align-items: center; 
-						justify-content: center; 
-						font-size: 3em;
-						z-index: 9999;
-						">
-						LOADING...
-						</div>
-					</article>
+					
 					
 					<article id="MainRoom" class="panel special"
 							style="
@@ -249,8 +234,8 @@ roll
 					</article>
 										
 			</div>
-
-		<!-- Scripts -->
+    <script type="module" src="assets/js/dice_handler.js"></script>
+  <!-- Scripts -->
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
 		<script src="assets/js/breakpoints.min.js"></script>
@@ -258,6 +243,7 @@ roll
 		<script src="assets/js/main.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/web-animations-js@2.3.2/web-animations.min.js"></script>
 		<script>
+		
 			// Your Lambda URL
 			const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/'; 
 			const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/'; 
@@ -549,7 +535,7 @@ roll
 				fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
 				
 				// Navigate to Loading Screen
-				window.location.href = "#LoadingScreen"; 
+				window.location.href = "#MainRoom"; 
 			} 
 			else {
 				document.getElementById('error').style.display = 'block';

@@ -15,7 +15,7 @@ small, strike, strong, sub, sup, tt, var, b,
 u, i, center, dl, dt, dd, ol, ul, li, fieldset,
 form, label, legend, table, caption, tbody,
 tfoot, thead, tr, th, td, article, aside,
-canvas, details, embed, figure, figcaption,
+details, embed, figure, figcaption,
 footer, header, hgroup, menu, nav, output, ruby,
 section, summary, time, mark, audio, video {
 	margin: 0;
@@ -23,7 +23,9 @@ section, summary, time, mark, audio, video {
 	border: 0;
 	font-size: 100%;
 	font: inherit;
-	vertical-align: baseline;}
+	vertical-align: baseline;
+	position: relative;
+	z-index: 2;}
 
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
@@ -1215,6 +1217,7 @@ input, select, textarea {
 		min-height: 100vh;
 		padding: 3em;
 		width: 100%;
+		
 	}
 
 		@media screen and (max-width: 1280px) {
@@ -1731,4 +1734,31 @@ h3 {
   padding: 2em;
   margin: 2em;
 }
-]
+
+#dice-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  z-index: 200;
+  pointer-events: none;
+}
+
+#dice-box canvas {
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  pointer-events: none;
+}
+button#rollem {
+  position: relative;
+  z-index: 100;
+}
+
+button#rollem {
+  cursor: pointer;
+}
+
