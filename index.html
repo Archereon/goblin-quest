@@ -60,7 +60,7 @@ roll
     <div>
       <button id="rollem">Roll em!</button>
     </div>
-    <div id="dice-box"></div>
+    
 	<!-- Wrapper -->
 			<div id="wrapper">
 					
@@ -176,6 +176,8 @@ roll
 								height: calc(100vh - 400px); /* Adjust 100px to fit your layout */;
 							"
 						></div>
+						<!-- Dice box! -->
+					<div id="dice-box"></div>
 					</div>
 					
 					<!-- Actions (input, roll, end turn, etc.) -->
@@ -217,19 +219,7 @@ roll
 							height: calc(100vh - 400px); /* Adjust 100px to fit your layout */
 						"
 					></div>
-					<!-- Dice image -->
-					<div style="margin-top: 1em;">
-						<img 
-							id="diceImage" 
-							src="images/dice_1.png" 
-							alt="Dice" 
-							style="max-width: 150px; height: auto;"
-						/>
-
-						<div id="diceModifierBox" style="margin-top: 0.5em; font-weight: bold;">
-							Die Mod: <span id="diceModifierValue"></span>
-						</div>
-					</div>
+					
 				</div>
 					</article>
 										
@@ -257,6 +247,7 @@ roll
 							// If the response is not OK, throw an error (this will skip the next .then block)
 							throw new Error(`HTTP error! Status: ${response.status}`);
 						}
+						console.log("Returning the pull lambda response")
 						return response.json();
 					})
 					.then(data => {
@@ -298,26 +289,6 @@ roll
 						//}
 						
 						// Update all the screens
-
-						// ============================
-						// Update the dice roll image
-						// ============================
-						if (data.most_recent_roll) {
-							const diceImage = document.getElementById('diceImage');
-							diceImage.src = `images/dice_${data.most_recent_roll}.png`;
-						}
-						
-						// ============================
-						// Update the dice modifier
-						// ============================
-						if (data.modifier) {
-							const diceModifierValue = document.getElementById('diceModifierValue');
-							diceModifierValue.textContent = data.modifier;
-						} else {
-							// If there's no modifier, show something like NONE or leave it blank
-							document.getElementById('diceModifierValue').textContent = 'NONE';
-						}
-												
 												
 						// ======================================
 						// Update the player's data table
@@ -359,7 +330,7 @@ roll
 							  `);
 							}
 						  }
-
+						  console.log("Howdy 2")
 						  healthRow.innerHTML = `
 							<th style="padding: 0.5em;">Health</th>
 							<td style="padding: 0.5em;">${healthCellHTML.join('')}</td>

@@ -6,12 +6,16 @@ let Box = new DiceBox({
   theme: "default",
   themeColor: "#feea03",
   offscreen: true,
-  scale: 6,
-  container: '#dice-box'
+  scale: 3,
+  container: '#dice-box',
+  canvasWidth: 500,
+  canvasHeight: 500
 });
 
 Box.init().then(async (world) => {
-  Box.roll(["4d6"], 200);
+  Box.roll(["4d6"], {
+    themeColor: get_random(colors)
+  }, {a: 10000, b: 20000, c: 30000, d: 40000}, 16);
 });
 
 const button = document.getElementById("rollem");
@@ -34,7 +38,7 @@ function get_random(list) {
 }
 
 button.addEventListener("click", (e) => {
-  Box.roll(["4d6"], 200, {
+  Box.roll(["4d6"], {
     themeColor: get_random(colors)
-  });
+  }, {a: 10000, b: 20000, c: 30000, d: 40000}, 16);
 });

@@ -1737,21 +1737,25 @@ h3 {
 
 #dice-box {
   position: absolute;
-  top: 0;
-  left: 0;
+  margin: auto;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
   background-size: cover;
   z-index: 200;
   pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 #dice-box canvas {
-  width: 100%;
-  height: 100%;
+  margin: auto;
   z-index: 200;
   pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 button#rollem {
   position: relative;
