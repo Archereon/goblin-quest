@@ -437,8 +437,6 @@ roll
 						Box.roll([data.number_of_rolls_remaining+"d6"], {
 							themeColor: get_random(colors)
 						  }, {a: roll_seed*10000, b: roll_seed*20000, c: roll_seed*30000, d: roll_seed*40000}, 16);
-						  document.getElementById('rollButton').style.display='none';
-						  document.getElementById('endTurnButton').style.display='none';
 						  document.getElementById('submitTextButton').style.display='none';
 						
 						}
@@ -451,8 +449,6 @@ roll
 						}
 	
 			document.getElementById('Connect').onclick = function() {
-				document.getElementById('rollButton').style.display='none';
-				document.getElementById('endTurnButton').style.display='none';
 				document.getElementById('submitTextButton').style.display='none';
 				const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
 				const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
@@ -495,41 +491,11 @@ roll
 			}
 			};
 			
-			//////////////////////////////////////////////
-			// PROCESS ROLL RESULTS
-			/////////////////////////////////////////////
-			diceBox.onRollComplete = function(roll_result) {
-				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
-				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
-				if (storedRoomID) {
-					fetch(pushLambdaUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify({
-							"action_type": "roll",
-							"room_id": storedRoomID,
-							"player_id": storedPlayerID,
-							"data": roll_result
-
-						}),
-					})
-					.then(response => response.json())
-					.then(data => console.log('Success:', data))
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-				}
-			};
-			
 			///////////////////////////////////////////////////////////
 			// HANDLE TEXT SUBMISSION
 			////////////////////////////////////////////////////////////
 
 			document.getElementById('submitTextButton').onclick = function() {
-			    document.getElementById('rollButton').style.display='none';
-				document.getElementById('endTurnButton').style.display='none';
 				document.getElementById('submitTextButton').style.display='none';
 				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
 				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
@@ -569,43 +535,57 @@ roll
 		    });
 			
 			
-			//////////////////////////////////////////////////
-			// SET UP DICE BOX
-			//////////////////////////////////////////////////
-			import DiceBox from "../../dist/dice-box.es.min.js";
-
-			let Box = new DiceBox({
-			  assetPath: "assets/",
-			  origin: "https://unpkg.com/@3d-dice/dice-box@1.1.4/dist/",
-			  theme: "default",
-			  themeColor: "#feea03",
-			  offscreen: true,
-			  scale: 5,
-			  container: '#dice-box',
-			  canvasWidth: 500,
-			  canvasHeight: 500
-			});
-
-			Box.init()
-
-			const colors = [
-			  "#348888",
-			  "#22BABB",
-			  "#9EF8EE",
-			  "#FA7F08",
-			  "#F24405",
-			  "#F25EB0",
-			  "#B9BF04",
-			  "#F2B705",
-			  "#F27405",
-			  "#F23005"
-			];
-
-			function get_random(list) {
-			  return list[Math.floor(Math.random() * list.length)];
-			}
-
+			
 		</script>
+		<!-- Other scripts as normal... -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/main.js"></script>
+<!-- etc. -->
+
+	<script type="module">
+	//////////////////////////////////////////////////
+	// SET UP DICE BOX
+	//////////////////////////////////////////////////
+
+	  import DiceBox from "../../dist/dice-box.es.min.js";
+	  
+	  // Create a global "Box" so that other scripts can see it:
+	  window.Box = new DiceBox({
+		assetPath: "assets/",
+		origin: "https://unpkg.com/@3d-dice/dice-box@1.1.4/dist/",
+		theme: "default",
+		themeColor: "#feea03",
+		offscreen: true,
+		scale: 5,
+		container: '#dice-box',
+		canvasWidth: 500,
+		canvasHeight: 500
+	  });
+
+	  window.Box.init();
+
+	  // If you want an onRollComplete callback:
+	  window.Box.onRollComplete = function(roll_result) {
+		const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+		const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+
+		// Post the result to your Lambda
+		fetch("YOUR_PUSH_LAMBDA_URL", {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({
+			"action_type": "roll",
+			"room_id": storedRoomID,
+			"player_id": storedPlayerID,
+			"data": roll_result
+		  }),
+		})
+		.then(r => r.json())
+		.then(data => console.log('Dice roll posted:', data))
+		.catch(err => console.error('Error:', err));
+	  };
+	</script>
+
 
 	</body>
 </html>
