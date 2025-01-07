@@ -173,7 +173,6 @@ roll
 								height: calc(100vh - 400px); /* Adjust 100px to fit your layout */;
 							"
 						></div>
-						<!-- Dice box! -->
 					
 					
 					<!-- Actions (input, roll, end turn, etc.) -->
@@ -219,6 +218,53 @@ roll
 			</div>
     
   <!-- Scripts -->
+	  <script type="module">
+		//////////////////////////////////////////////////
+		// SET UP DICE BOX
+		//////////////////////////////////////////////////
+		const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/'; 
+		const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/'; 
+		  import DiceBox from "./dist/dice-box.es.min.js";
+		  
+		  // Create a global "Box" so that other scripts can see it:
+		  window.Box = new DiceBox({
+			assetPath: "assets/",
+			origin: "https://unpkg.com/@3d-dice/dice-box@1.1.4/dist/",
+			theme: "default",
+			themeColor: "#feea03",
+			offscreen: true,
+			scale: 5,
+			container: '#dice-box',
+			canvasWidth: 500,
+			canvasHeight: 500
+		  });
+
+		  window.Box.init().then(() => {
+			  console.log("DiceBox is ready!");
+			  // Safe to call Box.roll() from here on...
+			});
+
+		  // If you want an onRollComplete callback:
+		  window.Box.onRollComplete = function(roll_result) {
+			const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+			const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+
+			// Post the result to your Lambda
+			fetch(pushLambdaUrl, {
+			  method: 'POST',
+			  headers: { 'Content-Type': 'application/json' },
+			  body: JSON.stringify({
+				"action_type": "roll",
+				"room_id": storedRoomID,
+				"player_id": storedPlayerID,
+				"data": roll_result
+			  }),
+			})
+			.then(r => r.json())
+			.then(data => console.log('Dice roll posted:', data))
+			.catch(err => console.error('Error:', err));
+		  };
+		</script>
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
 		<script src="assets/js/breakpoints.min.js"></script>
@@ -241,7 +287,6 @@ roll
 							// If the response is not OK, throw an error (this will skip the next .then block)
 							throw new Error(`HTTP error! Status: ${response.status}`);
 						}
-						console.log("Returning the pull lambda response")
 						return response.json();
 					})
 					.then(data => {
@@ -407,12 +452,7 @@ roll
 						const submitTextButton = document.getElementById('submitTextButton');
 						const instructionsBox = document.getElementById('instructionsBox');
 						if (data.turn_order && data.turn_order[data.current_turn_index] === player_id) {
-						    if (data.game_state=='WAITING_FOR_ROLL' ) {
-								// It's this player's turn -> show the buttons
-								submitTextButton.style.display = 'none';
-								instructionsBox.textContent = 'Roll the dice, or end your turn early! Rolls remaining: ' + data.number_of_rolls_remaining;
-								}
-							else if (data.game_state=='WAITING_FOR_ACTION_TEXT'){
+						    if (data.game_state=='WAITING_FOR_ACTION_TEXT'){
 								submitTextButton.style.display = 'inline-block';
 								instructionsBox.textContent = 'Your turn! Write what you want to do.';
 								}
@@ -434,11 +474,16 @@ roll
 							instructionsBox.textContent = "Waiting for other player's turn: " + data.turn_order[data.current_turn_index];
 						}
 						if (roll_seed != data.roll_seed) {
-						Box.roll([data.number_of_rolls_remaining+"d6"], {
-							themeColor: get_random(colors)
-						  }, {a: roll_seed*10000, b: roll_seed*20000, c: roll_seed*30000, d: roll_seed*40000}, 16);
-						  document.getElementById('submitTextButton').style.display='none';
+						console.log("There was a new roll_seed detected!")
+						console.log(data.number_of_rolls_remaining.toString()+"d6")
+						console.log(data.roll_seed)
+						roll_seed = data.roll_seed
 						
+						Box.roll([data.number_of_rolls_remaining.toString()+"d6"], {
+							themeColor: "#F24405"
+						  }, {a: data.roll_seed*10000, b: data.roll_seed*20000, c: data.roll_seed*30000, d: data.roll_seed*40000}, 16);
+						  document.getElementById('submitTextButton').style.display='none';
+						console.log("Made it after the roll")
 						}
 					})
 					.catch(error => {
@@ -541,50 +586,6 @@ roll
 <script src="assets/js/jquery.min.js"></script>
 <script src="assets/js/main.js"></script>
 <!-- etc. -->
-
-	<script type="module">
-	//////////////////////////////////////////////////
-	// SET UP DICE BOX
-	//////////////////////////////////////////////////
-
-	  import DiceBox from "./dist/dice-box.es.min.js";
-	  
-	  // Create a global "Box" so that other scripts can see it:
-	  window.Box = new DiceBox({
-		assetPath: "assets/",
-		origin: "https://unpkg.com/@3d-dice/dice-box@1.1.4/dist/",
-		theme: "default",
-		themeColor: "#feea03",
-		offscreen: true,
-		scale: 5,
-		container: '#dice-box',
-		canvasWidth: 500,
-		canvasHeight: 500
-	  });
-
-	  window.Box.init();
-
-	  // If you want an onRollComplete callback:
-	  window.Box.onRollComplete = function(roll_result) {
-		const storedRoomID = document.getElementById('room_id').value.toUpperCase();
-		const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
-
-		// Post the result to your Lambda
-		fetch("YOUR_PUSH_LAMBDA_URL", {
-		  method: 'POST',
-		  headers: { 'Content-Type': 'application/json' },
-		  body: JSON.stringify({
-			"action_type": "roll",
-			"room_id": storedRoomID,
-			"player_id": storedPlayerID,
-			"data": roll_result
-		  }),
-		})
-		.then(r => r.json())
-		.then(data => console.log('Dice roll posted:', data))
-		.catch(err => console.error('Error:', err));
-	  };
-	</script>
 
 
 	</body>
