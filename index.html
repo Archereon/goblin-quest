@@ -193,9 +193,6 @@ roll
 					>
 						<input type="text" id="descriptionInput" maxlength="200" placeholder="Describe something..." />
 						<ul class="actions special" style="margin-top: 1em;">
-							<li><a class="button" id="rollButton">Roll Dice</a></li>
-							<li><a class="button" id="endTurnButton">Retreat!</a></li>
-							<li><a class="button" id="useAIButton">Write for me!</a></li>
 							<li><a class="button" id="submitTextButton">Tell The Tale!</a></li>
 						</ul>
 						<div id="instructionsBox" style="margin-top: 0.5em; font-weight: bold;">
@@ -224,7 +221,7 @@ roll
 					</article>
 						
 			</div>
-    <script type="module" src="assets/js/dice_handler.js"></script>
+    
   <!-- Scripts -->
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/browser.min.js"></script>
@@ -240,6 +237,7 @@ roll
 	
 			// Function to fetch the latest roll result from the Lambda URL
 			let firstSuccessfulFetch = true;
+			let roll_seed = 0;
 			function fetchPlayerUpdate(room_id, player_id) {
 				fetch(`${pullLambdaUrl}?room_id=${room_id}`)
 					.then(response => {
@@ -281,7 +279,7 @@ roll
 						//    'current_turn_index': 0,
 						//    'game_state': 'WAITING_FOR_NEXT_ACTION',
 						//    'game_stage': 1,
-						//    'most_recent_roll': 1,
+						//    'roll_seed': 1,
 						//    'game_log': ['lots of text here', 'lots of text here'],
 						//    'game_story': ['lots of text here too', 'even more text here'],
 						//    'turn_results': ['something good', 'goblin died'],
@@ -330,7 +328,6 @@ roll
 							  `);
 							}
 						  }
-						  console.log("Howdy 2")
 						  healthRow.innerHTML = `
 							<th style="padding: 0.5em;">Health</th>
 							<td style="padding: 0.5em;">${healthCellHTML.join('')}</td>
@@ -411,57 +408,44 @@ roll
 						// ==========================
 						// Show or hide action buttons
 						// ==========================
-						const rollButton = document.getElementById('rollButton');
-						const endTurnButton = document.getElementById('endTurnButton');
 						const submitTextButton = document.getElementById('submitTextButton');
-						const useAIButton = document.getElementById('useAIButton');
 						const instructionsBox = document.getElementById('instructionsBox');
 						if (data.turn_order && data.turn_order[data.current_turn_index] === player_id) {
-						    if (data.game_state=='WAITING_FOR_FIRST_ROLL' || data.game_state=='WAITING_FOR_ROLL' ) {
+						    if (data.game_state=='WAITING_FOR_ROLL' ) {
 								// It's this player's turn -> show the buttons
-								rollButton.style.display = 'inline-block';
-								endTurnButton.style.display = 'inline-block';
 								submitTextButton.style.display = 'none';
-								useAIButton.style.display = 'none';
 								instructionsBox.textContent = 'Roll the dice, or end your turn early! Rolls remaining: ' + data.number_of_rolls_remaining;
 								}
 							else if (data.game_state=='WAITING_FOR_ACTION_TEXT'){
-							    rollButton.style.display = 'none';
-							    endTurnButton.style.display = 'none';
-								useAIButton.style.display = 'none';
 								submitTextButton.style.display = 'inline-block';
 								instructionsBox.textContent = 'Your turn! Write what you want to do.';
 								}
 							else if (data.game_state=='WAITING_FOR_POST_ROLL_NARRATION') {
-								rollButton.style.display = 'none';
-							    endTurnButton.style.display = 'none';
-								useAIButton.style.display = 'none';
 								submitTextButton.style.display = 'inline-block';
 								instructionsBox.textContent = 'Your turn is over! Narrate what happened on your turn! As a reminder: ' + data.turn_results.join(", ");
 							    }
 							else if (data.game_state=='PROCESSING') {
-								rollButton.style.display = 'none';
-							    endTurnButton.style.display = 'none';
-								useAIButton.style.display = 'none';
 								submitTextButton.style.display = 'none';
 							    instructionsBox.textContent = 'Processing previous turn....';
 								}
 							else {
-								rollButton.style.display = 'none';
-								endTurnButton.style.display = 'none';
 								submitTextButton.style.display = 'none';
-								useAIButton.style.display = 'none';
 								
 							}
 						} else {
 							// It's not this player's turn -> hide the buttons
-							rollButton.style.display = 'none';
-							endTurnButton.style.display = 'none';
 							submitTextButton.style.display = 'none';
-							useAIButton.style.display = 'none';
 							instructionsBox.textContent = "Waiting for other player's turn: " + data.turn_order[data.current_turn_index];
 						}
+						if (roll_seed != data.roll_seed) {
+						Box.roll([data.number_of_rolls_remaining+"d6"], {
+							themeColor: get_random(colors)
+						  }, {a: roll_seed*10000, b: roll_seed*20000, c: roll_seed*30000, d: roll_seed*40000}, 16);
+						  document.getElementById('rollButton').style.display='none';
+						  document.getElementById('endTurnButton').style.display='none';
+						  document.getElementById('submitTextButton').style.display='none';
 						
+						}
 					})
 					.catch(error => {
 						// Log or handle the error here; the table update will not happen
@@ -514,11 +498,11 @@ roll
 				document.getElementById('error').style.display = 'block';
 			}
 			};
-	
-			document.getElementById('rollButton').onclick = function() {
-				document.getElementById('rollButton').style.display='none';
-				document.getElementById('endTurnButton').style.display='none';
-				document.getElementById('submitTextButton').style.display='none';
+			
+			//////////////////////////////////////////////
+			// PROCESS ROLL RESULTS
+			/////////////////////////////////////////////
+			diceBox.onRollComplete = function(roll_result) {
 				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
 				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
 				if (storedRoomID) {
@@ -531,7 +515,7 @@ roll
 							"action_type": "roll",
 							"room_id": storedRoomID,
 							"player_id": storedPlayerID,
-							"data": "True"
+							"data": roll_result
 
 						}),
 					})
@@ -543,33 +527,9 @@ roll
 				}
 			};
 			
-			document.getElementById('endTurnButton').onclick = function() {
-			    document.getElementById('rollButton').style.display='none';
-				document.getElementById('endTurnButton').style.display='none';
-				document.getElementById('submitTextButton').style.display='none';
-				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
-				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
-				if (storedRoomID) {
-					fetch(pushLambdaUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify({
-							"action_type": "roll",
-							"room_id": storedRoomID,
-							"player_id": storedPlayerID,
-							"data": "False"
-
-						}),
-					})
-					.then(response => response.json())
-					.then(data => console.log('Success:', data))
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-				}
-			};
+			///////////////////////////////////////////////////////////
+			// HANDLE TEXT SUBMISSION
+			////////////////////////////////////////////////////////////
 
 			document.getElementById('submitTextButton').onclick = function() {
 			    document.getElementById('rollButton').style.display='none';
@@ -611,6 +571,46 @@ roll
 			  this.value = this.value.substring(0, 200);
 			   }
 		    });
+			
+			
+			//////////////////////////////////////////////////
+			// SET UP DICE BOX
+			//////////////////////////////////////////////////
+			import DiceBox from "../../dist/dice-box.es.min.js";
+
+			let Box = new DiceBox({
+			  assetPath: "assets/",
+			  origin: "https://unpkg.com/@3d-dice/dice-box@1.1.4/dist/",
+			  theme: "default",
+			  themeColor: "#feea03",
+			  offscreen: true,
+			  scale: 5,
+			  container: '#dice-box',
+			  canvasWidth: 500,
+			  canvasHeight: 500
+			});
+
+			Box.init()
+
+			const button = document.getElementById("rollem");
+
+			const colors = [
+			  "#348888",
+			  "#22BABB",
+			  "#9EF8EE",
+			  "#FA7F08",
+			  "#F24405",
+			  "#F25EB0",
+			  "#B9BF04",
+			  "#F2B705",
+			  "#F27405",
+			  "#F23005"
+			];
+
+			function get_random(list) {
+			  return list[Math.floor(Math.random() * list.length)];
+			}
+
 		</script>
 
 	</body>

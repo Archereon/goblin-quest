@@ -6,7 +6,7 @@ let Box = new DiceBox({
   theme: "default",
   themeColor: "#feea03",
   offscreen: true,
-  scale: 3,
+  scale: 5,
   container: '#dice-box',
   canvasWidth: 500,
   canvasHeight: 500
