@@ -240,7 +240,6 @@ roll
 		  });
 
 		  window.Box.init().then(() => {
-			  console.log("DiceBox is ready!");
 			  // Safe to call Box.roll() from here on...
 			});
 
@@ -498,12 +497,15 @@ roll
 			/////////////////////////////////////////////////////////
 			document.getElementById('Connect').onclick = function() {
 				document.getElementById('submitTextButton').style.display='none';
+				document.getElementById('CreateRoom').style.display='none';
+				document.getElementById('Connect').style.display='none';
 				const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
 				const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
 				if (enteredRoomID) {
 					localStorage.setItem('enteredRoomID', enteredRoomID);
 					localStorage.setItem('enteredPlayerID', enteredPlayerID);
-					
+					const RoomStatus = document.getElementById('RoomStatus');
+					RoomStatus.innerHTML = 'Connecting...';
 					if (enteredRoomID) {
 					fetch(pushLambdaUrl, {
 						method: 'POST',
@@ -525,6 +527,8 @@ roll
 						console.error('HTTP Error:', response.status, response.statusText);
 						const RoomStatus = document.getElementById('RoomStatus');
 						RoomStatus.innerHTML = 'Could not find room.';
+						document.getElementById('CreateRoom').style.display='inline-block';
+						document.getElementById('Connect').style.display='inline-block';
 						throw new Error(`HTTP error! Status: ${response.status}`);
 						}
 					})
@@ -557,9 +561,13 @@ roll
 
 			document.getElementById('CreateRoom').onclick = function() {
 				document.getElementById('submitTextButton').style.display='none';
+				document.getElementById('CreateRoom').style.display='none';
+				document.getElementById('Connect').style.display='none';
 				const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
 				const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
 				if (enteredRoomID) {
+					const RoomStatus = document.getElementById('RoomStatus');
+					RoomStatus.innerHTML = 'Creating Room....';
 					localStorage.setItem('enteredRoomID', enteredRoomID);
 					localStorage.setItem('enteredPlayerID', enteredPlayerID);
 					
@@ -584,6 +592,8 @@ roll
 						console.error('HTTP Error:', response.status, response.statusText);
 						const RoomStatus = document.getElementById('RoomStatus');
 						RoomStatus.innerHTML = 'Room already exists. Please choose another name.';
+						document.getElementById('CreateRoom').style.display='inline-block';
+						document.getElementById('Connect').style.display='inline-block';
 						throw new Error(`HTTP error! Status: ${response.status}`);
 						}})
 					.then(data => {
