@@ -45,254 +45,280 @@ roll
 -->
 <html lang="en">
     <head>
-		<title>Goblin Quest</title>
-		<meta name="keywords" content="goblins" />
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap">
+        <title>Goblin Quest</title>
+        <meta name="keywords" content="goblins" />
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="assets/css/main.css" />
+        <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap">
+    </head>
+    <body class="is-preload-0 is-preload-1">
+        <!-- Wrapper -->
+        <div id="wrapper">
+            <!-- Dice Box (3D Dice Roller) -->
+            <div id="dice-box"></div>
 
-	</head>
-  <body class="is-preload-0 is-preload-1">
-    
-	<!-- Wrapper -->
-			<div id="wrapper">
-					<div id="dice-box"></div>
-					
-					<article id="RoomConnect" class="panel special">
-					    <section>
-						<header>
-							<h3>Gather your goblins!</h3>
-						</header>
-						<div id="roomInput">
-							<input type="text" id="room_id" placeholder="Enter Room">
-						</div>
-						<div id="playerIDInput">
-							<input type="text" id="player_id" placeholder="Enter Name">
-						</div>
-						<ul class="actions special" style="margin-top: 1em;">
-							<li><a class="button" id="Connect">Connect</a></li>
-							<li><a class="button" id="CreateRoom">Create Room</a></li>
-						</ul>
-						<div id="RoomStatus"></div>
-						</section>
-						
-					</article>
-					
-					<article id="RoomSetup" class="panel special">
-					    <!-- POPULATE THIS -->
-						
-					</article>
-					
-					<article id="MainRoom" class="panel special"
-							style="
-							display: flex; 
-							flex-direction: row; 
-							gap: 1em; 
-							justify-content: space-between;
-							align-items: flex-start;
-							padding: 1em;
-						">
-						<!-- LEFT COLUMN -->
-				<div id="left-column" style="flex: 1; display: flex; flex-direction: column; gap: 1em;">
-					
+            <!-- Room Connect Panel -->
+            <article id="RoomConnect" class="panel special">
+                <section>
+                    <header>
+                        <h3>Gather your goblins!</h3>
+                    </header>
+                    <div id="roomInput">
+                        <input type="text" id="room_id" placeholder="Enter Room">
+                    </div>
+                    <div id="playerIDInput">
+                        <input type="text" id="player_id" placeholder="Enter Name">
+                    </div>
+                    <ul class="actions special" style="margin-top: 1em;">
+                        <li><a class="button" id="Connect">Connect</a></li>
+                        <li><a class="button" id="CreateRoom">Create Room</a></li>
+                    </ul>
+                    <div id="RoomStatus"></div>
+                </section>
+            </article>
 
-					<!-- Stage Health -->
-					<div>
-						<h3>Stage Health</h3>
-						<img 
-							id="stageHealthImage" 
-							src="images/heart_100_percent.png" 
-							alt="Stage Health" 
-							style="max-width: 150px; height: auto;"
-						/>
-					</div>
+            <!-- Room Setup Panel -->
+            <article id="RoomSetup" class="panel special">
+                <section style="display: flex; flex-direction: row; justify-content: space-around; gap: 2em;">
+                    <!-- Left side: Game Speed & Text Boxes -->
+                    <div>
+                        <h3>Game Speed</h3>
+                        <label>
+                            <input type="radio" name="gameSpeed" value="normal" checked> Normal
+                        </label>
+                        <label style="margin-left: 1em;">
+                            <input type="radio" name="gameSpeed" value="fast"> Fast
+                        </label>
 
-					<!-- Player Data Table (vertical orientation) -->
-					<div>
-						<h3>Your Goblin</h3>
-						<table 
-							id="playerDataTable" 
-							style="
-								margin: 0 auto; 
-								border: 1px solid #ccc; 
-								border-collapse: collapse;
-							"
-						>
-							<tbody id="playerDataTableBody">
-								<!-- Will be dynamically populated in JS -->
-							</tbody>
-						</table>
-						<!-- Goblin image (256x256) -->
-						<div style="text-align: center; margin-top: 1em;">
-							<img z
-								id="playerGoblinImage" 
-								src="images/dead_goblin.png" 
-								alt="Goblin Image" 
-								style="width: 256px; height: 256px;"
-							/>
-						</div>
-					</div>
-				</div>
-				
-				<!-- MIDDLE COLUMN -->
-				<div 
-					id="middle-column" 
-					style="
-						flex: 2; 
-						display: flex; 
-						flex-direction: column;
-						gap: 1em;
-					"
-				>
-					<!-- Game Story -->
-					<div style="flex: 1; display: flex; flex-direction: column;">
-						<h3>Game Story</h3>
-						<!-- Stage Label -->
-						<div 
-							id="stageLabelContainer" 
-							style="
-								border: 1px solid #ccc; 
-								padding: 0.5em; 
-								background-color: #2f3021; 
-								color: #ececec;
-								text-align: center; 
-								font-weight: bold;
-								font-size: 30px;
-							"
-						>
-							<span id="stageLabel">Stage: ???</span>
-						</div>
-						<div 
-							id="gameStory"
-							style="
-								border: 1px solid #ccc;
-								overflow-y: auto;
-								padding: 1em;
-								background-color: #2f3021; 
-								color: #ececec;   
-								border: 2px dashed #4f4c2a;
-								height: calc(100vh - 400px); /* Adjust 100px to fit your layout */;
-							"
-						></div>
-					
-					
-					<!-- Actions (input, roll, end turn, etc.) -->
-					<div 
-						class="actions" 
-						style="
-							display: flex; 
-							flex-direction: column; 
-							border: 1px solid #ccc;
-							padding: 1em;
-							background-color: #2f3021;
-						"
-					>
-						<input type="text" id="descriptionInput" maxlength="200" placeholder="Describe something..." />
-						<ul class="actions special" style="margin-top: 1em;">
-							<li><a class="button" id="submitTextButton">Tell The Tale!</a></li>
-						</ul>
-						<div id="instructionsBox" style="margin-top: 0.5em; font-weight: bold;">
-							Hello
-						</div>
-					</div>
-				</div>
-				</div>
-				<!-- RIGHT COLUMN -->
-				<div id="right-column" style="flex: 1; display: flex; flex-direction: column;">
-					<h3>Goblin Gossip</h3>
-					<div 
-						id="gameLog" 
-						style="
-							border: 1px solid #ccc;
-							overflow-y: auto;
-							padding: 1em;
-							background-color: #2f3021; 
-							color: #ececec;   
-							border: 2px dashed #4f4c2a;
-							height: calc(100vh - 400px); /* Adjust 100px to fit your layout */
-						"
-					></div>
-					
-				</div>
-					</article>
-						
-			</div>
-    
-  <!-- Scripts -->
-	  <script type="module">
-		//////////////////////////////////////////////////
-		// SET UP DICE BOX
-		//////////////////////////////////////////////////
-		const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/'; 
-		const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/'; 
-		  import DiceBox from "./dist/dice-box.es.min.js";
-		  
-		  // Create a global "Box" so that other scripts can see it:
-		  window.Box = new DiceBox({
-			assetPath: "assets/",
-			origin: "https://unpkg.com/@3d-dice/dice-box@1.1.4/dist/",
-			theme: "default",
-			themeColor: "#feea03",
-			offscreen: true,
-			scale: 5,
-			container: '#dice-box',
-			canvasWidth: 500,
-			canvasHeight: 500
-		  });
+                        <div id="textBoxSection" style="margin-top: 1em;">
+                            <!-- These text boxes will be dynamically populated via JavaScript -->
+                        </div>
+                    </div>
 
-		  window.Box.init().then(() => {
-			  // Safe to call Box.roll() from here on...
-			});
+                    <!-- Right side: Connected Players -->
+                    <div>
+                        <h3>Players Connected</h3>
+                        <ul id="connectedPlayers" style="list-style-type: none; padding-left: 0;">
+                            <!-- Populated dynamically with player IDs -->
+                        </ul>
+                    </div>
+                </section>
+            </article>
 
-		  // If you want an onRollComplete callback:
-		  window.Box.onRollComplete = function(roll_result) {
-			const storedRoomID = document.getElementById('room_id').value.toUpperCase();
-			const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+            <!-- Main Room Panel -->
+            <article id="MainRoom" class="panel special"
+                style="
+                    display: flex; 
+                    flex-direction: row; 
+                    gap: 1em; 
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    padding: 1em;
+                "
+            >
+                <!-- LEFT COLUMN -->
+                <div id="left-column" style="flex: 1; display: flex; flex-direction: column; gap: 1em;">
+                    <!-- Stage Health -->
+                    <div>
+                        <h3>Stage Health</h3>
+                        <img 
+                            id="stageHealthImage" 
+                            src="images/heart_100_percent.png" 
+                            alt="Stage Health" 
+                            style="max-width: 150px; height: auto;"
+                        />
+                    </div>
 
-			// Post the result to your Lambda
-			fetch(pushLambdaUrl, {
-			  method: 'POST',
-			  headers: { 'Content-Type': 'application/json' },
-			  body: JSON.stringify({
-				"action_type": "roll",
-				"room_id": storedRoomID,
-				"player_id": storedPlayerID,
-				"data": roll_result
-			  }),
-			})
-			.then(r => r.json())
-			.then(data => console.log('Dice roll posted:', data))
-			.catch(err => console.error('Error:', err));
-		  };
-		</script>
-		<script src="assets/js/jquery.min.js"></script>
-		<script src="assets/js/browser.min.js"></script>
-		<script src="assets/js/breakpoints.min.js"></script>
-		<script src="assets/js/util.js"></script>
-		<script src="assets/js/main.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/web-animations-js@2.3.2/web-animations.min.js"></script>
-		<script>
-		
-			// Your Lambda URL
-			const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/'; 
-			const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/'; 
-	
-			// Function to fetch the latest roll result from the Lambda URL
-			let firstSuccessfulFetch = true;
-			let roll_seed = 0;
-			function fetchPlayerUpdate(room_id, player_id) {
-				fetch(`${pullLambdaUrl}?room_id=${room_id}`)
-					.then(response => {
-						if (!response.ok) {
-							// If the response is not OK, throw an error (this will skip the next .then block)
-							throw new Error(`HTTP error! Status: ${response.status}`);
-						}
-						return response.json();
-					})
-					.then(data => {
+                    <!-- Player Data Table (vertical orientation) -->
+                    <div>
+                        <h3>Your Goblin</h3>
+                        <table 
+                            id="playerDataTable" 
+                            style="
+                                margin: 0 auto; 
+                                border: 1px solid #ccc; 
+                                border-collapse: collapse;
+                            "
+                        >
+                            <tbody id="playerDataTableBody">
+                                <!-- Will be dynamically populated in JS -->
+                            </tbody>
+                        </table>
+                        <!-- Goblin image (256x256) -->
+                        <div style="text-align: center; margin-top: 1em;">
+                            <img 
+                                id="playerGoblinImage" 
+                                src="images/dead_goblin.png" 
+                                alt="Goblin Image" 
+                                style="width: 256px; height: 256px;"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MIDDLE COLUMN -->
+                <div 
+                    id="middle-column" 
+                    style="
+                        flex: 2; 
+                        display: flex; 
+                        flex-direction: column;
+                        gap: 1em;
+                    "
+                >
+                    <!-- Game Story -->
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <h3>Game Story</h3>
+                        <!-- Stage Label -->
+                        <div 
+                            id="stageLabelContainer" 
+                            style="
+                                border: 1px solid #ccc; 
+                                padding: 0.5em; 
+                                background-color: #2f3021; 
+                                color: #ececec;
+                                text-align: center; 
+                                font-weight: bold;
+                                font-size: 30px;
+                            "
+                        >
+                            <span id="stageLabel">Stage: ???</span>
+                        </div>
+                        <div 
+                            id="gameStory"
+                            style="
+                                border: 1px solid #ccc;
+                                overflow-y: auto;
+                                padding: 1em;
+                                background-color: #2f3021; 
+                                color: #ececec;   
+                                border: 2px dashed #4f4c2a;
+                                height: calc(100vh - 400px);
+                            "
+                        ></div>
+
+                        <!-- Actions (input, roll, end turn, etc.) -->
+                        <div 
+                            class="actions" 
+                            style="
+                                display: flex; 
+                                flex-direction: column; 
+                                border: 1px solid #ccc;
+                                padding: 1em;
+                                background-color: #2f3021;
+                            "
+                        >
+                            <input type="text" id="descriptionInput" maxlength="200" placeholder="Describe something..." />
+                            <ul class="actions special" style="margin-top: 1em;">
+                                <li><a class="button" id="submitTextButton">Tell The Tale!</a></li>
+                            </ul>
+                            <div id="instructionsBox" style="margin-top: 0.5em; font-weight: bold;">
+                                Hello
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div id="right-column" style="flex: 1; display: flex; flex-direction: column;">
+                    <h3>Goblin Gossip</h3>
+                    <div 
+                        id="gameLog" 
+                        style="
+                            border: 1px solid #ccc;
+                            overflow-y: auto;
+                            padding: 1em;
+                            background-color: #2f3021; 
+                            color: #ececec;   
+                            border: 2px dashed #4f4c2a;
+                            height: calc(100vh - 400px);
+                        "
+                    ></div>
+                </div>
+            </article>
+        </div><!-- End of #wrapper -->
+
+        <!-- Scripts -->
+        <!-- Dice Box Setup (3D dice roller) -->
+        <script type="module">
+		  //////////////////////////////////////////////////
+		  // SET UP DICE BOX
+		  //////////////////////////////////////////////////
+            const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/';
+            const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/';
+            import DiceBox from "./dist/dice-box.es.min.js";
+          
+            // Create a global "Box" so that other scripts can see it:
+            window.Box = new DiceBox({
+                assetPath: "assets/",
+                origin: "https://unpkg.com/@3d-dice/dice-box@1.1.4/dist/",
+                theme: "default",
+                themeColor: "#feea03",
+                offscreen: true,
+                scale: 5,
+                container: '#dice-box',
+                canvasWidth: 500,
+                canvasHeight: 500
+            });
+
+            window.Box.init().then(() => {
+                // Safe to call Box.roll() from here on...
+            });
+
+            // Callback when roll completes
+            window.Box.onRollComplete = function(roll_result) {
+                const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+                const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+
+                // Post the result to your Lambda
+                fetch(pushLambdaUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "action_type": "roll",
+                        "room_id": storedRoomID,
+                        "player_id": storedPlayerID,
+                        "data": roll_result
+                    }),
+                })
+                .then(r => r.json())
+                .then(data => console.log('Dice roll posted:', data))
+                .catch(err => console.error('Error:', err));
+            };
+        </script>
+
+        <!-- jQuery / Utility Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/web-animations-js@2.3.2/web-animations.min.js"></script>
+
+        <!-- Main Game Script -->
+        <script>
+            const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/';
+            const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/';
+            
+            // Track first fetch
+            let firstSuccessfulFetch = true;
+            let roll_seed = 0;
+
+            /////////////////////////////////////////////////////
+            // POLLING: Fetch Player Update
+            /////////////////////////////////////////////////////
+            function fetchPlayerUpdate(room_id, player_id) {
+                fetch(`${pullLambdaUrl}?room_id=${room_id}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
 						// 'data' contains the state of the game. Here is an example of what it looks like:
 						//{  
 						//  'room_id': 'ABCD',
@@ -329,348 +355,403 @@ roll
 						//    'turn_results': ['something good', 'goblin died'],
 						//    'prompts': ['prompt 1', 'prompt 2', 'etc']
 						//}
-						
+
 						// Update all the screens
 												
-						// ======================================
-						// Update the player's data table
-						// ======================================
-						const currentPlayer = data.player_data[player_id];
-						if (currentPlayer) {
-							// If this is the first successful fetch, hide loading overlay and show the main room
-						  if (firstSuccessfulFetch) {
-							window.location.href = "#MainRoom"; 
-							firstSuccessfulFetch = false;
-						  }
-						  const tableBody = document.getElementById('playerDataTableBody');
-						  tableBody.innerHTML = '';
+                        // If we succeed first time, move to #MainRoom
+                        if (data.player_data && data.player_data[player_id] && firstSuccessfulFetch) {
+                            window.location.href = "#MainRoom"; 
+                            firstSuccessfulFetch = false;
+                        }
 
-						  // Build the "Health" row with tiny goblin icons
-						  const healthRow = document.createElement('tr');
-						  const healthCellHTML = [];
+                        // 1. Update player's data table
+                        updatePlayerDataTable(data, player_id);
 
-						  // We assume the player always has 5 goblins total.
-						  // For each goblin slot (0 to 4), decide if it's alive or dead
-						  for (let i = 0; i < 5; i++) {
-							if (i < currentPlayer.health) {
-							  // Goblin is alive
-							  healthCellHTML.push(`
-								<img 
-								  src="images/alive_goblin.png" 
-								  alt="Alive Goblin" 
-								  style="width:24px; vertical-align:middle; margin-right:4px;"
-								/>
-							  `);
-							} else {
-							  // Goblin is dead
-							  healthCellHTML.push(`
-								<img 
-								  src="images/dead_goblin.png" 
-								  alt="Dead Goblin" 
-								  style="width:24px; vertical-align:middle; margin-right:4px;"
-								/>
-							  `);
-							}
-						  }
-						  healthRow.innerHTML = `
-							<th style="padding: 0.5em;">Health</th>
-							<td style="padding: 0.5em;">${healthCellHTML.join('')}</td>
-						  `;
-						  tableBody.appendChild(healthRow);
+                        // 2. Update stage health
+                        updateStageHealth(data);
 
-						  // Build and append the other rows: Expertise, Heirloom, Feature, Dream
-						  const rows = [
-							{ label: "Expertise", value: currentPlayer.expertise },
-							{ label: "Heirloom",  value: currentPlayer.heirloom },
-							{ label: "Feature",   value: currentPlayer.feature },
-							{ label: "Dream",     value: currentPlayer.dream },
-						  ];
+                        // 3. Update game log
+                        if (data.game_log) {
+                            const gameLogContainer = document.getElementById('gameLog');
+                            gameLogContainer.innerText = data.game_log.join('\n\n');
+                            gameLogContainer.scrollTop = gameLogContainer.scrollHeight;
+                        }
 
-						  rows.forEach(rowData => {
-							const row = document.createElement('tr');
-							row.innerHTML = `
-							  <th style="padding: 0.5em;">${rowData.label}</th>
-							  <td style="padding: 0.5em;">${rowData.value}</td>
-							`;
-							tableBody.appendChild(row);
-						  });
-						}
-						if (currentPlayer.image) {
-							document.getElementById('playerGoblinImage').src = currentPlayer.image;
-						}
-						
-						// =================================
-						// Update the Stage Health Image
-						// =================================
-						if (typeof data.stage_health === 'number' && typeof data.stage_max_health === 'number') {
-							// Calculate ratio
-							const ratio = data.stage_health / data.stage_max_health;
-							let heartImageName = '';
+                        // 4. Update game story
+                        if (data.game_story) {
+                            const gameStoryContainer = document.getElementById('gameStory');
+                            gameStoryContainer.innerText = data.game_story.join('\n\n');
+                            gameStoryContainer.scrollTop = gameStoryContainer.scrollHeight;
+                        }
 
-							if (ratio <= 0) {
-								heartImageName = 'heart_0_percent.png';
-							} else if (ratio <= 0.25) {
-								heartImageName = 'heart_25_percent.png';
-							} else if (ratio <= 0.50) {
-								heartImageName = 'heart_50_percent.png';
-							} else if (ratio <= 0.75) {
-								heartImageName = 'heart_75_percent.png';
-							} else {
-								heartImageName = 'heart_100_percent.png';
-							}
+                        // 5. Update stage label
+                        updateStageLabel(data);
 
-							// Set the image source
-							const stageHealthImage = document.getElementById('stageHealthImage');
-							stageHealthImage.src = `images/${heartImageName}`;
-						}
-						
-						// Update the game log
-						if (data.game_log) {
-							const gameLogContainer = document.getElementById('gameLog');
-							gameLogContainer.innerText = data.game_log.join('\n\n');
-							gameLogContainer.scrollTop = gameLogContainer.scrollHeight;
-						}
-						
-						// Update the game story
-						if (data.game_story) {
-							const gameStoryContainer = document.getElementById('gameStory');
-							gameStoryContainer.innerText = data.game_story.join('\n\n');
-							gameStoryContainer.scrollTop = gameStoryContainer.scrollHeight;
-						}
-						
-						// Update the stage label
-						if (data.prompts && typeof data.game_stage !== 'undefined') {
-							const stageLabel = document.getElementById('stageLabel');
-							// Ensure we have a prompt for this game_stage
-							if (data.prompts[data.game_stage]) {
-								stageLabel.textContent = `Stage: ${data.prompts[data.game_stage]}`;
-							} else {
-								stageLabel.textContent = `Stage: Unknown`;
-							}
-						}
-						
-						// ==========================
-						// Show or hide action buttons
-						// ==========================
-						const submitTextButton = document.getElementById('submitTextButton');
-						const instructionsBox = document.getElementById('instructionsBox');
-						if (data.turn_order && data.turn_order[data.current_turn_index] === player_id) {
-						    if (data.game_state=='WAITING_FOR_ACTION_TEXT'){
-								submitTextButton.style.display = 'inline-block';
-								instructionsBox.textContent = 'Your turn! Write what you want to do.';
-								}
-							else if (data.game_state=='WAITING_FOR_POST_ROLL_NARRATION') {
-								submitTextButton.style.display = 'inline-block';
-								instructionsBox.textContent = 'Your turn is over! Narrate what happened on your turn! As a reminder: ' + data.turn_results.join(", ");
-							    }
-							else if (data.game_state=='PROCESSING') {
-								submitTextButton.style.display = 'none';
-							    instructionsBox.textContent = 'Processing previous turn....';
-								}
-							else {
-								submitTextButton.style.display = 'none';
-								
-							}
-						} else {
-							// It's not this player's turn -> hide the buttons
-							submitTextButton.style.display = 'none';
-							instructionsBox.textContent = "Waiting for other player's turn: " + data.turn_order[data.current_turn_index];
-						}
-						if (roll_seed != data.roll_seed) {
-						console.log("There was a new roll_seed detected!")
-						console.log(data.number_of_rolls_remaining.toString()+"d6")
-						console.log(data.roll_seed)
-						roll_seed = data.roll_seed
-						
-						Box.roll([data.number_of_rolls_remaining.toString()+"d6"], {
-							themeColor: "#F24405"
-						  }, {a: data.roll_seed*10000, b: data.roll_seed*20000, c: data.roll_seed*30000, d: data.roll_seed*40000}, 16);
-						  document.getElementById('submitTextButton').style.display='none';
-						console.log("Made it after the roll")
-						}
-					})
-					.catch(error => {
-						// Log or handle the error here; the table update will not happen
-						console.error('No player data to update right now');
-					});
+                        // 6. Show or hide action buttons
+                        updateActionButtons(data, player_id);
 
-						}
-	
-			/////////////////////////////////////////////////////////
-			// HANDLE CONNECT BUTTON
-			/////////////////////////////////////////////////////////
-			document.getElementById('Connect').onclick = function() {
-				document.getElementById('submitTextButton').style.display='none';
-				document.getElementById('CreateRoom').style.display='none';
-				document.getElementById('Connect').style.display='none';
-				const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
-				const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
-				if (enteredRoomID) {
-					localStorage.setItem('enteredRoomID', enteredRoomID);
-					localStorage.setItem('enteredPlayerID', enteredPlayerID);
-					const RoomStatus = document.getElementById('RoomStatus');
-					RoomStatus.innerHTML = 'Connecting...';
-					if (enteredRoomID) {
-					fetch(pushLambdaUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify({
-							"action_type": "connect",
-							"room_id": enteredRoomID,
-							"player_id": enteredPlayerID,
-							"data": "connect"
+                        // 7. Check for new dice roll (roll_seed)
+                        handleNewDiceRoll(data);
 
-						}),
-					})
-					.then(response => {
-						if (response.ok) {
-						return response.json(); // Parse the JSON if the response is successful
-						} else {
-						console.error('HTTP Error:', response.status, response.statusText);
-						const RoomStatus = document.getElementById('RoomStatus');
-						RoomStatus.innerHTML = 'Could not find room.';
-						document.getElementById('CreateRoom').style.display='inline-block';
-						document.getElementById('Connect').style.display='inline-block';
-						throw new Error(`HTTP error! Status: ${response.status}`);
-						}
-					})
-					.then(data => {
-						// Start polling for the roll result
-						setInterval(() => fetchPlayerUpdate(enteredRoomID, enteredPlayerID), 1000);
-						const RoomStatus = document.getElementById('RoomStatus');
-						RoomStatus.innerHTML = 'Room found! Connecting...';
-						// Fetch the latest roll immediately on page load
-						fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
+                        // 8. Update Connected Players (in #connectedPlayers)
+                        updateConnectedPlayers(data);
+                    })
+                    .catch(error => {
+                        console.error('No player data to update right now', error);
+                    });
+            }
 
-						// Navigate to Loading Screen
-						window.location.href = "#MainRoom"; 
+            /////////////////////////////////////////////////////
+            // CONNECT / CREATE ROOM
+            /////////////////////////////////////////////////////
+            document.getElementById('Connect').onclick = function() {
+                document.getElementById('submitTextButton').style.display='none';
+                document.getElementById('CreateRoom').style.display='none';
+                document.getElementById('Connect').style.display='none';
 
-					})
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-				}
-				
-			} 
-			else {
-				document.getElementById('error').style.display = 'block';
-			}
-			};
-			
-			/////////////////////////////////////////////////////////
-			// HANDLE CREATE ROOM BUTTON
-			/////////////////////////////////////////////////////////
+                const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
+                const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
 
-			document.getElementById('CreateRoom').onclick = function() {
-				document.getElementById('submitTextButton').style.display='none';
-				document.getElementById('CreateRoom').style.display='none';
-				document.getElementById('Connect').style.display='none';
-				const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
-				const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
-				if (enteredRoomID) {
-					const RoomStatus = document.getElementById('RoomStatus');
-					RoomStatus.innerHTML = 'Creating Room....';
-					localStorage.setItem('enteredRoomID', enteredRoomID);
-					localStorage.setItem('enteredPlayerID', enteredPlayerID);
-					
-					if (enteredRoomID) {
-					fetch(pushLambdaUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify({
-							"action_type": "connect",
-							"room_id": enteredRoomID,
-							"player_id": enteredPlayerID,
-							"data": "create"
+                if (!enteredRoomID) {
+                    console.error("No room ID provided.");
+                    return;
+                }
 
-						}),
-					})
-					.then(response => 
-					{if (response.ok) {
-						return response.json(); // Parse the JSON if the response is successful
-						} else {
-						console.error('HTTP Error:', response.status, response.statusText);
-						const RoomStatus = document.getElementById('RoomStatus');
-						RoomStatus.innerHTML = 'Room already exists. Please choose another name.';
-						document.getElementById('CreateRoom').style.display='inline-block';
-						document.getElementById('Connect').style.display='inline-block';
-						throw new Error(`HTTP error! Status: ${response.status}`);
-						}})
-					.then(data => {
-							// Start polling for the roll result
-							setInterval(() => fetchPlayerUpdate(enteredRoomID, enteredPlayerID), 1000);
+                localStorage.setItem('enteredRoomID', enteredRoomID);
+                localStorage.setItem('enteredPlayerID', enteredPlayerID);
 
-							// Fetch the latest roll immediately on page load
-							fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
-							
-							// Navigate to Loading Screen
-							window.location.href = "#MainRoom"; 
-						})
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-				}
-			else {
-				document.getElementById('error').style.display = 'block';
-			}
-			}
-		};
+                const RoomStatus = document.getElementById('RoomStatus');
+                RoomStatus.innerHTML = 'Connecting...';
 
-			///////////////////////////////////////////////////////////
-			// HANDLE TEXT SUBMISSION
-			////////////////////////////////////////////////////////////
+                fetch(pushLambdaUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "action_type": "connect",
+                        "room_id": enteredRoomID,
+                        "player_id": enteredPlayerID,
+                        "data": "connect"
+                    }),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        console.error('HTTP Error:', response.status, response.statusText);
+                        RoomStatus.innerHTML = 'Could not find room.';
+                        document.getElementById('CreateRoom').style.display='inline-block';
+                        document.getElementById('Connect').style.display='inline-block';
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                })
+                .then(data => {
+                    // Start polling
+                    setInterval(() => fetchPlayerUpdate(enteredRoomID, enteredPlayerID), 1000);
+                    RoomStatus.innerHTML = 'Room found! Connecting...';
+                    fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
 
-			document.getElementById('submitTextButton').onclick = function() {
-				document.getElementById('submitTextButton').style.display='none';
-				const storedRoomID = document.getElementById('room_id').value.toUpperCase();
-				const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+                    // Jump to #MainRoom
+                    window.location.href = "#MainRoom"; 
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            };
 
-				const description = document.getElementById('descriptionInput').value;
+            document.getElementById('CreateRoom').onclick = function() {
+                document.getElementById('submitTextButton').style.display='none';
+                document.getElementById('CreateRoom').style.display='none';
+                document.getElementById('Connect').style.display='none';
 
-				if (storedRoomID) {
-					document.getElementById('descriptionInput').value = '';
-					fetch(pushLambdaUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify({
-							"action_type": "describe",
-							"room_id": storedRoomID,
-							"player_id": storedPlayerID,
-							"data": description
+                const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
+                const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
 
-						}),
-					})
-					.then(response => response.json())
-					.then(data => {
-						console.log('Success:', data);
-					})
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-				}
-			};
-			
-			const descriptionInput = document.getElementById('descriptionInput');
-	        descriptionInput.addEventListener('input', function() {
-			if (this.value.length > 200) {
-			  this.value = this.value.substring(0, 200);
-			   }
-		    });
-			
-			
-			
-		</script>
-		<!-- Other scripts as normal... -->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/main.js"></script>
-<!-- etc. -->
+                if (!enteredRoomID) {
+                    console.error("No room ID provided for create.");
+                    return;
+                }
 
+                const RoomStatus = document.getElementById('RoomStatus');
+                RoomStatus.innerHTML = 'Creating Room....';
 
-	</body>
+                localStorage.setItem('enteredRoomID', enteredRoomID);
+                localStorage.setItem('enteredPlayerID', enteredPlayerID);
+
+                fetch(pushLambdaUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "action_type": "connect",
+                        "room_id": enteredRoomID,
+                        "player_id": enteredPlayerID,
+                        "data": "create"
+                    }),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        console.error('HTTP Error:', response.status, response.statusText);
+                        RoomStatus.innerHTML = 'Room already exists. Please choose another name.';
+                        document.getElementById('CreateRoom').style.display='inline-block';
+                        document.getElementById('Connect').style.display='inline-block';
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                })
+                .then(data => {
+                    // Start polling
+                    setInterval(() => fetchPlayerUpdate(enteredRoomID, enteredPlayerID), 1000);
+                    fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
+
+                    // Jump to #MainRoom
+                    window.location.href = "#MainRoom"; 
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            };
+
+            /////////////////////////////////////////////////////
+            // Submit Text Button
+            /////////////////////////////////////////////////////
+            document.getElementById('submitTextButton').onclick = function() {
+                document.getElementById('submitTextButton').style.display='none';
+
+                const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+                const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+                const description = document.getElementById('descriptionInput').value;
+
+                if (storedRoomID) {
+                    document.getElementById('descriptionInput').value = '';
+                    fetch(pushLambdaUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "action_type": "describe",
+                            "room_id": storedRoomID,
+                            "player_id": storedPlayerID,
+                            "data": description
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+            };
+
+            // Limit description input to 200 chars
+            const descriptionInput = document.getElementById('descriptionInput');
+            descriptionInput.addEventListener('input', function() {
+                if (this.value.length > 200) {
+                    this.value = this.value.substring(0, 200);
+                }
+            });
+
+            /////////////////////////////////////////////////////
+            // Utility functions
+            /////////////////////////////////////////////////////
+            function updatePlayerDataTable(data, player_id) {
+                const currentPlayer = data.player_data[player_id];
+                if (!currentPlayer) return;
+
+                const tableBody = document.getElementById('playerDataTableBody');
+                tableBody.innerHTML = '';
+
+                // Build the Health row with 5 goblins (alive or dead)
+                const healthRow = document.createElement('tr');
+                const healthCellHTML = [];
+                for (let i = 0; i < 5; i++) {
+                    if (i < currentPlayer.health) {
+						// Goblin is alive
+                        healthCellHTML.push(`
+                            <img 
+                                src="images/alive_goblin.png" 
+                                alt="Alive Goblin" 
+                                style="width:24px; vertical-align:middle; margin-right:4px;"
+                            />
+                        `);
+                    } else {
+						// Goblin is dead
+                        healthCellHTML.push(`
+                            <img 
+                                src="images/dead_goblin.png" 
+                                alt="Dead Goblin" 
+                                style="width:24px; vertical-align:middle; margin-right:4px;"
+                            />
+                        `);
+                    }
+                }
+                healthRow.innerHTML = `
+                    <th style="padding: 0.5em;">Health</th>
+                    <td style="padding: 0.5em;">${healthCellHTML.join('')}</td>
+                `;
+                tableBody.appendChild(healthRow);
+
+                // Build and append Expertise, Heirloom, Feature, Dream
+                const rows = [
+                    { label: "Expertise", value: currentPlayer.expertise },
+                    { label: "Heirloom",  value: currentPlayer.heirloom },
+                    { label: "Feature",   value: currentPlayer.feature },
+                    { label: "Dream",     value: currentPlayer.dream },
+                ];
+                rows.forEach(rowData => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <th style="padding: 0.5em;">${rowData.label}</th>
+                        <td style="padding: 0.5em;">${rowData.value}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Update Goblin image if provided
+                if (currentPlayer.image) {
+                    document.getElementById('playerGoblinImage').src = currentPlayer.image;
+                }
+            }
+
+			// =================================
+			// Update the Stage Health Image
+			// =================================
+            function updateStageHealth(data) {
+                if (typeof data.stage_health === 'number' && typeof data.stage_max_health === 'number') {
+                    const ratio = data.stage_health / data.stage_max_health;
+                    let heartImageName = '';
+                    if (ratio <= 0) {
+                        heartImageName = 'heart_0_percent.png';
+                    } else if (ratio <= 0.25) {
+                        heartImageName = 'heart_25_percent.png';
+                    } else if (ratio <= 0.50) {
+                        heartImageName = 'heart_50_percent.png';
+                    } else if (ratio <= 0.75) {
+                        heartImageName = 'heart_75_percent.png';
+                    } else {
+                        heartImageName = 'heart_100_percent.png';
+                    }
+                    document.getElementById('stageHealthImage').src = `images/${heartImageName}`;
+                }
+            }
+
+            function updateStageLabel(data) {
+                if (data.prompts && typeof data.game_stage !== 'undefined') {
+                    const stageLabel = document.getElementById('stageLabel');
+					// Ensure we have a prompt for this game_stage
+                    if (data.prompts[data.game_stage]) {
+                        stageLabel.textContent = `Current Goal: ${data.prompts[data.game_stage]}`;
+                    } else {
+                        stageLabel.textContent = `Current Goal: Unknown`;
+                    }
+                }
+            }
+
+            function updateActionButtons(data, player_id) {
+                const submitTextButton = document.getElementById('submitTextButton');
+                const instructionsBox = document.getElementById('instructionsBox');
+
+                if (data.turn_order && data.turn_order[data.current_turn_index] === player_id) {
+                    if (data.game_state === 'WAITING_FOR_ACTION_TEXT') {
+                        submitTextButton.style.display = 'inline-block';
+                        instructionsBox.textContent = 'Your turn! Write what you want to do.';
+                    }
+                    else if (data.game_state === 'WAITING_FOR_POST_ROLL_NARRATION') {
+                        submitTextButton.style.display = 'inline-block';
+                        instructionsBox.textContent = 'Your turn is over! Narrate what happened! ' +
+                            'As a reminder: ' + data.turn_results.join(", ");
+                    }
+                    else if (data.game_state === 'PROCESSING') {
+                        submitTextButton.style.display = 'none';
+                        instructionsBox.textContent = 'Processing previous turn....';
+                    }
+                    else {
+                        submitTextButton.style.display = 'none';
+                    }
+                } else {
+                    submitTextButton.style.display = 'none';
+                    if (data.turn_order) {
+                        instructionsBox.textContent = "Waiting for other player's turn: " + data.turn_order[data.current_turn_index];
+                    } else {
+                        instructionsBox.textContent = "Waiting for another player...";
+                    }
+                }
+            }
+
+            function handleNewDiceRoll(data) {
+                if (roll_seed != data.roll_seed) {
+                    console.log("There was a new roll_seed detected!");
+                    console.log(data.number_of_rolls_remaining.toString() + "d6");
+                    console.log(data.roll_seed);
+                    roll_seed = data.roll_seed;
+
+                    Box.roll(
+                        [data.number_of_rolls_remaining.toString() + "d6"],
+                        { themeColor: "#F24405" },
+                        {
+                            a: data.roll_seed * 10000,
+                            b: data.roll_seed * 20000,
+                            c: data.roll_seed * 30000,
+                            d: data.roll_seed * 40000
+                        },
+                        16
+                    );
+                    document.getElementById('submitTextButton').style.display='none';
+                    console.log("Made it after the roll");
+                }
+            }
+
+            function updateConnectedPlayers(data) {
+                // `data.player_data` is an object: { player_id: {...}, player_id_2: {...}, ... }
+                if (!data.player_data) return;
+                const connectedPlayers = Object.keys(data.player_data);
+                const listEl = document.getElementById('connectedPlayers');
+                listEl.innerHTML = '';
+                connectedPlayers.forEach(pid => {
+                    const li = document.createElement('li');
+                    li.textContent = pid;
+                    listEl.appendChild(li);
+                });
+            }
+
+            /////////////////////////////////////////////////////
+            // Game Speed Radio: Show 9 or 5 text boxes
+            /////////////////////////////////////////////////////
+            const gameSpeedRadios = document.getElementsByName('gameSpeed');
+            const textBoxSection = document.getElementById('textBoxSection');
+
+            function renderTextBoxes(count) {
+                // Clear existing boxes
+                textBoxSection.innerHTML = '';
+                // Append new boxes
+                for (let i = 1; i <= count; i++) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = `Text #${i}`;
+                    input.style.display = 'block';
+                    input.style.marginBottom = '0.5em';
+                    textBoxSection.appendChild(input);
+                }
+            }
+
+            // Default to 9 on page load
+            renderTextBoxes(9);
+
+            // Listen for changes in Game Speed
+            gameSpeedRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.value === 'normal') {
+                        renderTextBoxes(9);
+                    } else {
+                        renderTextBoxes(5);
+                    }
+                });
+            });
+
+        </script>
+
+        <!-- Double-including these scripts is fine if you have them in your pipeline already -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/main.js"></script>
+    </body>
 </html>
