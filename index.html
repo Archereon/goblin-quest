@@ -96,6 +96,11 @@ roll
                         <div id="textBoxSection" style="margin-top: 1em;">
                             <!-- These text boxes will be dynamically populated via JavaScript -->
                         </div>
+						<!-- Start Game Button -->
+                        <div style="margin-top: 1em;">
+                            <a class="button" id="defaultStoryButton">Use Default Story</a>
+                            <a class="button" id="startGameButton">Start Game!</a>
+                        </div>
                     </div>
 
                     <!-- Right side: Connected Players -->
@@ -300,6 +305,22 @@ roll
 
         <!-- Main Game Script -->
         <script>
+            const DEFAULTPROMPTSNORMAL = ["You are goblins that live in a goblin camp. You are largely left to your own devices until there is a battle that the orcs and wizards send you into as cannon fodder. One day, you all decide to investigate the mysteries of a nearby pool of slime that is guarded by bears. To do this, you decide you need to steal a prize winning bear, use its body to create a bear suit, and then use the bear suit to investigate the pool of slime.",
+                                            "Infiltrate the Bear Show without being seen.",
+                                            "Find the prize winning bear.",
+                                            "Abscond with the bear.",
+                                            "Somehow kill a fully-grown bear, and a prize-winning one at that.",
+                                            "Turn the bear into a functional bearsuit.",
+                                            "Teach yourselves how to operate the bearsuit.",
+                                            "Infiltrate bear society.",
+                                            "Defeat the bear guardian of the goop pool.",
+                                            "Discover the secret of the slimy pool, and live to tell the tale!"]
+            const DEFAULTPROMPTSFAST = ["You are goblins that live in a goblin camp. You are largely left to your own devices until there is a battle that the orcs and wizards send you into as cannon fodder. One day, you all decide to investigate the mysteries of a nearby pool of slime that is guarded by bears. To do this, you decide you need to steal a prize winning bear, use its body to create a bear suit, and then use the bear suit to investigate the pool of slime.",
+                                        "Infiltrate the Bear Show without being seen.",
+                                        "Abscond with the bear.",
+                                        "Somehow kill a fully-grown bear, and a prize-winning one at that.",
+                                        "Turn the bear into a functional bearsuit.",
+                                        "Infiltrate bear society to discover the secret of the slimy pool, and live to tell the tale!"]
             const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/';
             const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/';
             
@@ -503,11 +524,69 @@ roll
                     setInterval(() => fetchPlayerUpdate(enteredRoomID, enteredPlayerID), 1000);
                     fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
 
-                    // Jump to #MainRoom
-                    window.location.href = "#MainRoom"; 
+                    // Jump to #RoomSetup
+                    window.location.href = "#RoomSetup"; 
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                });
+            };
+
+			/////////////////////////////////////////////////////
+            // START GAME Button
+            /////////////////////////////////////////////////////
+            document.getElementById('startGameButton').onclick = function() {
+                const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
+                const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
+
+                // 1. Get selected game speed
+                const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
+
+                if (speedRadio && speedRadio.value === 'fast') {
+                    const rawPrompts = [
+                        document.getElementById('GameSummary').value,
+                        document.getElementById('Prompt1').value,
+                        document.getElementById('Prompt2').value,
+                        document.getElementById('Prompt3').value,
+                        document.getElementById('Prompt4').value,
+                        document.getElementById('Prompt5').value
+                    ];
+                } else {
+					const rawPrompts = [
+                        document.getElementById('GameSummary').value,
+                        document.getElementById('Prompt1').value,
+                        document.getElementById('Prompt2').value,
+                        document.getElementById('Prompt3').value,
+                        document.getElementById('Prompt4').value,
+                        document.getElementById('Prompt5').value,
+                        document.getElementById('Prompt6').value,
+                        document.getElementById('Prompt7').value,
+                        document.getElementById('Prompt8').value,
+                        document.getElementById('Prompt9').value,
+                    ];
+				}
+
+                // 4. Send "start" command to pushLambdaUrl
+                fetch(pushLambdaUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "action_type": "start",
+                        "room_id": enteredRoomID,
+                        "player_id": enteredPlayerID,
+                        "data": rawPrompts
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Game started:', data);
+                    // Optionally navigate or show a message
+                    alert('Game started with speed: ' + gameSpeed);
+					// Jump to #MainRoom
+                    window.location.href = "#MainRoom"; 
+                })
+                .catch((error) => {
+                    console.error('Error starting game:', error);
                 });
             };
 
@@ -552,6 +631,43 @@ roll
             });
 
             /////////////////////////////////////////////////////
+            // Submit Text Button
+            /////////////////////////////////////////////////////
+            document.getElementById('defaultStoryButton').onclick = function() {
+                const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
+
+                if (speedRadio && speedRadio.value === 'fast') {
+                    document.getElementById('GameSummary').value = DEFAULTPROMPTSFAST[0];
+                    document.getElementById('Prompt1').value = DEFAULTPROMPTSFAST[1];
+                    document.getElementById('Prompt2').value = DEFAULTPROMPTSFAST[2];
+                    document.getElementById('Prompt3').value = DEFAULTPROMPTSFAST[3];
+                    document.getElementById('Prompt4').value = DEFAULTPROMPTSFAST[4];
+                    document.getElementById('Prompt5').value = DEFAULTPROMPTSFAST[5];
+                } else {
+                    document.getElementById('GameSummary').value = DEFAULTPROMPTSNORMAL[0];
+                    document.getElementById('Prompt1').value = DEFAULTPROMPTSNORMAL[1];
+                    document.getElementById('Prompt2').value = DEFAULTPROMPTSNORMAL[2];
+                    document.getElementById('Prompt3').value = DEFAULTPROMPTSNORMAL[3];
+                    document.getElementById('Prompt4').value = DEFAULTPROMPTSNORMAL[4];
+                    document.getElementById('Prompt5').value = DEFAULTPROMPTSNORMAL[5];
+                    document.getElementById('Prompt6').value = DEFAULTPROMPTSNORMAL[6];
+                    document.getElementById('Prompt7').value = DEFAULTPROMPTSNORMAL[7];
+                    document.getElementById('Prompt8').value = DEFAULTPROMPTSNORMAL[8];
+                    document.getElementById('Prompt9').value = DEFAULTPROMPTSNORMAL[9];
+                }
+
+                
+            };
+
+            // Limit description input to 200 chars
+            const descriptionInput = document.getElementById('descriptionInput');
+            descriptionInput.addEventListener('input', function() {
+                if (this.value.length > 200) {
+                    this.value = this.value.substring(0, 200);
+                }
+            });
+
+            /////////////////////////////////////////////////////
             // Utility functions
             /////////////////////////////////////////////////////
             function updatePlayerDataTable(data, player_id) {
@@ -561,10 +677,10 @@ roll
                 const tableBody = document.getElementById('playerDataTableBody');
                 tableBody.innerHTML = '';
 
-                // Build the Health row with 5 goblins (alive or dead)
+                // Build the Health row with goblins icons (alive or dead)
                 const healthRow = document.createElement('tr');
                 const healthCellHTML = [];
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < currentPlayer.max_health; i++) {
                     if (i < currentPlayer.health) {
 						// Goblin is alive
                         healthCellHTML.push(`
@@ -715,17 +831,26 @@ roll
             }
 
             /////////////////////////////////////////////////////
-            // Game Speed Radio: Show 9 or 5 text boxes
+            // Game Speed Radio: Show 10 or 6 text boxes
             /////////////////////////////////////////////////////
             const gameSpeedRadios = document.getElementsByName('gameSpeed');
+            const defaultStory = document.getElementById('defaultStoryButton');
             const textBoxSection = document.getElementById('textBoxSection');
 
             function renderTextBoxes(count) {
                 // Clear existing boxes
                 textBoxSection.innerHTML = '';
                 // Append new boxes
+                const input = document.createElement('input');
+                    input.id = "GameSummary";
+                    input.type = 'text';
+                    input.placeholder = "Write a story background here";
+                    input.style.display = 'block';
+                    input.style.marginBottom = '0.5em';
+                    textBoxSection.appendChild(input);
                 for (let i = 1; i <= count; i++) {
                     const input = document.createElement('input');
+                    input.id = "Prompt"+i;
                     input.type = 'text';
                     input.placeholder = `Text #${i}`;
                     input.style.display = 'block';
