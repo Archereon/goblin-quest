@@ -521,6 +521,7 @@ roll
                 })
                 .then(data => {
                     // Start polling
+                    firstSuccessfulFetch = false; // Need to set so we don't immediately switch windows
                     setInterval(() => fetchPlayerUpdate(enteredRoomID, enteredPlayerID), 1000);
                     fetchPlayerUpdate(enteredRoomID, enteredPlayerID);
 
