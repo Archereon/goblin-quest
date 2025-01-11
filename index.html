@@ -84,7 +84,7 @@ roll
             <article id="RoomSetup" class="panel special">
                 <section style="display: flex; flex-direction: row; justify-content: space-around; gap: 2em;">
                     <!-- Left side: Game Speed & Text Boxes -->
-                    <div>
+                    <div>   
                         <h3>Game Speed</h3>
                         <!-- Normal speed -->
                         <input type="radio" id="gameSpeedNormal" name="gameSpeed" value="normal" checked>
@@ -582,8 +582,6 @@ roll
                 .then(response => response.json())
                 .then(data => {
                     console.log('Game started:', data);
-                    // Optionally navigate or show a message
-                    alert('Game started with speed: ' + gameSpeed);
 					// Jump to #MainRoom
                     window.location.href = "#MainRoom"; 
                 })
@@ -627,9 +625,8 @@ roll
             /////////////////////////////////////////////////////
             // Submit Text Button
             /////////////////////////////////////////////////////
+            const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
             document.getElementById('defaultStoryButton').onclick = function() {
-                const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
-
                 if (speedRadio && speedRadio.value === 'fast') {
                     document.getElementById('GameSummary').value = DEFAULTPROMPTSFAST[0];
                     document.getElementById('Prompt1').value = DEFAULTPROMPTSFAST[1];
