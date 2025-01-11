@@ -542,9 +542,9 @@ roll
 
                 // 1. Get selected game speed
                 const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
-
+                let rawPrompts;
                 if (speedRadio && speedRadio.value === 'fast') {
-                    const rawPrompts = [
+                    rawPrompts = [
                         document.getElementById('GameSummary').value,
                         document.getElementById('Prompt1').value,
                         document.getElementById('Prompt2').value,
@@ -553,7 +553,7 @@ roll
                         document.getElementById('Prompt5').value
                     ];
                 } else {
-					const rawPrompts = [
+					rawPrompts = [
                         document.getElementById('GameSummary').value,
                         document.getElementById('Prompt1').value,
                         document.getElementById('Prompt2').value,
