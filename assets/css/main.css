@@ -504,7 +504,7 @@ input, select, textarea {
 	textarea {
 		padding: 0.75em 1em;
 	}
-
+/*
 	input[type="checkbox"],
 	input[type="radio"] {
 		-moz-appearance: none;
@@ -586,7 +586,7 @@ input, select, textarea {
 	input[type="radio"] + label:before {
 		border-radius: 100%;
 	}
-
+*/
 	::-webkit-input-placeholder {
 		color: #bbb !important;
 		opacity: 1.0;
@@ -1792,4 +1792,3 @@ input[type="radio"] + label:before {
 	border-color: #4a6932;
 	color: #fff;
   }
-  
