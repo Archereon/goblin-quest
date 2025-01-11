@@ -86,12 +86,13 @@ roll
                     <!-- Left side: Game Speed & Text Boxes -->
                     <div>
                         <h3>Game Speed</h3>
-                        <label>
-                            <input type="radio" name="gameSpeed" value="normal" checked> Normal
-                        </label>
-                        <label style="margin-left: 1em;">
-                            <input type="radio" name="gameSpeed" value="fast"> Fast
-                        </label>
+                        <!-- Normal speed -->
+                        <input type="radio" id="gameSpeedNormal" name="gameSpeed" value="normal" checked>
+                        <label for="gameSpeedNormal">Normal</label>
+
+                        <!-- Fast speed -->
+                        <input type="radio" id="gameSpeedFast" name="gameSpeed" value="fast">
+                        <label for="gameSpeedFast">Fast</label>
 
                         <div id="textBoxSection" style="margin-top: 1em;">
                             <!-- These text boxes will be dynamically populated via JavaScript -->
