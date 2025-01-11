@@ -1766,3 +1766,30 @@ button#rollem {
   cursor: pointer;
 }
 
+/* Make sure it uses a round shape for radio. */
+input[type="radio"] + label:before {
+	border-radius: 50%;
+	content: '\f10c'; /* empty circle from Font Awesome */
+	font-family: 'Font Awesome 5 Free';
+	font-weight: 400;
+	background: rgba(64, 99, 50, 0.25);
+	border-color: #3f5135;
+	color: #3f5135;
+  }
+  
+  /* Change on hover/focus */
+  input[type="radio"]:focus + label:before,
+  input[type="radio"] + label:hover:before {
+	border-color: #6a824d;
+	background: rgba(64, 99, 50, 0.4);
+  }
+  
+  /* Checked state: filled dot */
+  input[type="radio"]:checked + label:before {
+	content: '\f111'; /* solid dot from Font Awesome */
+	font-weight: 900;
+	background: #6a824d;
+	border-color: #4a6932;
+	color: #fff;
+  }
+  
