@@ -626,8 +626,10 @@ roll
             /////////////////////////////////////////////////////
             // Submit Text Button
             /////////////////////////////////////////////////////
-            const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
+            
             document.getElementById('defaultStoryButton').onclick = function() {
+                const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
+                console.log("Using default story for mode "+ speedRadio)
                 if (speedRadio && speedRadio.value === 'fast') {
                     document.getElementById('GameSummary').value = DEFAULTPROMPTSFAST[0];
                     document.getElementById('Prompt1').value = DEFAULTPROMPTSFAST[1];
