@@ -544,6 +544,7 @@ roll
                 // 1. Get selected game speed
                 const speedRadio = document.querySelector('input[name="gameSpeed"]:checked');
                 let rawPrompts;
+                console.log("Starting game in "+speedRadio.value)
                 if (speedRadio && speedRadio.value === 'fast') {
                     rawPrompts = [
                         document.getElementById('GameSummary').value,
