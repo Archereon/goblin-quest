@@ -427,10 +427,6 @@ roll
             // CONNECT / CREATE ROOM
             /////////////////////////////////////////////////////
             document.getElementById('Connect').onclick = function() {
-                document.getElementById('submitTextButton').style.display='none';
-                document.getElementById('CreateRoom').style.display='none';
-                document.getElementById('Connect').style.display='none';
-
                 const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
                 const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
 
@@ -438,7 +434,13 @@ roll
                     console.error("No room ID provided.");
                     return;
                 }
-
+                if (!enteredPlayerID) {
+                    console.error("No room ID provided.");
+                    return;
+                }
+                document.getElementById('submitTextButton').style.display='none';
+                document.getElementById('CreateRoom').style.display='none';
+                document.getElementById('Connect').style.display='none';
                 localStorage.setItem('enteredRoomID', enteredRoomID);
                 localStorage.setItem('enteredPlayerID', enteredPlayerID);
 
@@ -481,17 +483,20 @@ roll
             };
 
             document.getElementById('CreateRoom').onclick = function() {
+                const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
+                const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
+                if (!enteredRoomID) {
+                    console.error("No room ID provided.");
+                    return;
+                }
+                if (!enteredPlayerID) {
+                    console.error("No room ID provided.");
+                    return;
+                }
+                
                 document.getElementById('submitTextButton').style.display='none';
                 document.getElementById('CreateRoom').style.display='none';
                 document.getElementById('Connect').style.display='none';
-
-                const enteredRoomID = document.getElementById('room_id').value.toUpperCase();
-                const enteredPlayerID = document.getElementById('player_id').value.toUpperCase();
-
-                if (!enteredRoomID) {
-                    console.error("No room ID provided for create.");
-                    return;
-                }
 
                 const RoomStatus = document.getElementById('RoomStatus');
                 RoomStatus.innerHTML = 'Creating Room....';
