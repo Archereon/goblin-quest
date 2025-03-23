@@ -253,8 +253,8 @@ roll
 		  //////////////////////////////////////////////////
 		  // SET UP DICE BOX
 		  //////////////////////////////////////////////////
-            const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/';
-            const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/';
+            const pushLambdaUrl = 'https://gwq42s2j43xaqa76dyaj3yehcy0mmbvs.lambda-url.us-west-2.on.aws/';
+            const pullLambdaUrl = 'https://zowbgcarzusgk4vle2gxqnjbea0hwfdd.lambda-url.us-west-2.on.aws/';
             import DiceBox from "./dist/dice-box.es.min.js";
           
             // Create a global "Box" so that other scripts can see it:
@@ -322,8 +322,8 @@ roll
                                         "Somehow kill a fully-grown bear, and a prize-winning one at that.",
                                         "Turn the bear into a functional bearsuit.",
                                         "Infiltrate bear society to discover the secret of the slimy pool, and live to tell the tale!"]
-            const pushLambdaUrl = 'https://6jcpwjkgw23nsy5q6zmzigs6va0gyyrv.lambda-url.us-west-1.on.aws/';
-            const pullLambdaUrl = 'https://sa3w22e7jvrdd4pjsrnrmvs3re0ytesc.lambda-url.us-west-1.on.aws/';
+            const pushLambdaUrl = 'https://gwq42s2j43xaqa76dyaj3yehcy0mmbvs.lambda-url.us-west-2.on.aws/';
+            const pullLambdaUrl = 'https://zowbgcarzusgk4vle2gxqnjbea0hwfdd.lambda-url.us-west-2.on.aws/';
             
             // Track first fetch
             let firstSuccessfulFetch = true;
@@ -438,12 +438,7 @@ roll
                     console.error("No room ID provided.");
                     return;
                 }
-                document.getElementById('submitTextButton').style.display='none';
-                document.getElementById('CreateRoom').style.display='none';
-                document.getElementById('Connect').style.display='none';
-                localStorage.setItem('enteredRoomID', enteredRoomID);
-                localStorage.setItem('enteredPlayerID', enteredPlayerID);
-
+                
                 const RoomStatus = document.getElementById('RoomStatus');
                 RoomStatus.innerHTML = 'Connecting...';
 
@@ -459,12 +454,18 @@ roll
                 })
                 .then(response => {
                     if (response.ok) {
+                        document.getElementById('submitTextButton').style.display='none';
+                        document.getElementById('CreateRoom').style.display='none';
+                        document.getElementById('Connect').style.display='none';
+                        localStorage.setItem('enteredRoomID', enteredRoomID);
+                        localStorage.setItem('enteredPlayerID', enteredPlayerID);
                         return response.json();
                     } else {
                         console.error('HTTP Error:', response.status, response.statusText);
                         RoomStatus.innerHTML = 'Could not find room.';
                         document.getElementById('CreateRoom').style.display='inline-block';
                         document.getElementById('Connect').style.display='inline-block';
+                        RoomStatus.innerHTML = 'Could not find room.';
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                 })
@@ -493,16 +494,8 @@ roll
                     console.error("No room ID provided.");
                     return;
                 }
-                
-                document.getElementById('submitTextButton').style.display='none';
-                document.getElementById('CreateRoom').style.display='none';
-                document.getElementById('Connect').style.display='none';
-
                 const RoomStatus = document.getElementById('RoomStatus');
                 RoomStatus.innerHTML = 'Creating Room....';
-
-                localStorage.setItem('enteredRoomID', enteredRoomID);
-                localStorage.setItem('enteredPlayerID', enteredPlayerID);
 
                 fetch(pushLambdaUrl, {
                     method: 'POST',
@@ -516,12 +509,18 @@ roll
                 })
                 .then(response => {
                     if (response.ok) {
+                        document.getElementById('submitTextButton').style.display='none';
+                        document.getElementById('CreateRoom').style.display='none';
+                        document.getElementById('Connect').style.display='none';
+                        localStorage.setItem('enteredRoomID', enteredRoomID);
+                        localStorage.setItem('enteredPlayerID', enteredPlayerID);
                         return response.json();
                     } else {
                         console.error('HTTP Error:', response.status, response.statusText);
                         RoomStatus.innerHTML = 'Room already exists. Please choose another name.';
                         document.getElementById('CreateRoom').style.display='inline-block';
                         document.getElementById('Connect').style.display='inline-block';
+                        RoomStatus.innerHTML = 'Room already exists. Please choose another name.';
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                 })
