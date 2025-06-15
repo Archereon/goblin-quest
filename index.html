@@ -153,15 +153,6 @@ roll
                                 <!-- Will be dynamically populated in JS -->
                             </tbody>
                         </table>
-                        <!-- Goblin image (256x256) -->
-                        <div style="text-align: center; margin-top: 1em;">
-                            <img 
-                                id="playerGoblinImage" 
-                                src="images/dead_goblin.png" 
-                                alt="Goblin Image" 
-                                style="width: 256px; height: 256px;"
-                            />
-                        </div>
                     </div>
                 </div>
 
@@ -220,6 +211,7 @@ roll
                             <input type="text" id="descriptionInput" maxlength="200" placeholder="Describe something..." />
                             <ul class="actions special" style="margin-top: 1em;">
                                 <li><a class="button" id="submitTextButton">Tell The Tale!</a></li>
+                                <li><a class="button" id="rerollButton">Use a Lucky Goblin Ear!</a></li>
                             </ul>
                             <div id="instructionsBox" style="margin-top: 0.5em; font-weight: bold;">
                                 Hello
@@ -455,6 +447,7 @@ roll
                 .then(response => {
                     if (response.ok) {
                         document.getElementById('submitTextButton').style.display='none';
+                        document.getElementById('rerollButton').style.display='none';
                         document.getElementById('CreateRoom').style.display='none';
                         document.getElementById('Connect').style.display='none';
                         localStorage.setItem('enteredRoomID', enteredRoomID);
@@ -510,6 +503,7 @@ roll
                 .then(response => {
                     if (response.ok) {
                         document.getElementById('submitTextButton').style.display='none';
+                        document.getElementById('rerollButton').style.display='none';
                         document.getElementById('CreateRoom').style.display='none';
                         document.getElementById('Connect').style.display='none';
                         localStorage.setItem('enteredRoomID', enteredRoomID);
@@ -599,6 +593,7 @@ roll
             /////////////////////////////////////////////////////
             document.getElementById('submitTextButton').onclick = function() {
                 document.getElementById('submitTextButton').style.display='none';
+                document.getElementById('rerollButton').style.display='none';
 
                 const storedRoomID = document.getElementById('room_id').value.toUpperCase();
                 const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
@@ -625,9 +620,42 @@ roll
                     });
                 }
             };
+            
+            /////////////////////////////////////////////////////
+            // Reroll Button
+            /////////////////////////////////////////////////////
+            document.getElementById('rerollButton').onclick = function() {
+                document.getElementById('submitTextButton').style.display='none';
+                document.getElementById('rerollButton').style.display='none';
+
+                const storedRoomID = document.getElementById('room_id').value.toUpperCase();
+                const storedPlayerID = document.getElementById('player_id').value.toUpperCase();
+                const description = document.getElementById('descriptionInput').value;
+
+                if (storedRoomID) {
+                    document.getElementById('descriptionInput').value = '';
+                    fetch(pushLambdaUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "action_type": "reroll",
+                            "room_id": storedRoomID,
+                            "player_id": storedPlayerID,
+                            "data": description
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+            };
 
             /////////////////////////////////////////////////////
-            // Submit Text Button
+            // Default Story Button
             /////////////////////////////////////////////////////
             
             document.getElementById('defaultStoryButton').onclick = function() {
@@ -720,10 +748,6 @@ roll
                     tableBody.appendChild(row);
                 });
 
-                // Update Goblin image if provided
-                if (currentPlayer.image) {
-                    document.getElementById('playerGoblinImage').src = currentPlayer.image;
-                }
             }
 
 			// =================================
@@ -762,6 +786,7 @@ roll
 
             function updateActionButtons(data, player_id) {
                 const submitTextButton = document.getElementById('submitTextButton');
+                const rerollButton = document.getElementById('rerollButton');
                 const instructionsBox = document.getElementById('instructionsBox');
 
                 if (data.turn_order && data.turn_order[data.current_turn_index] === player_id) {
@@ -771,6 +796,9 @@ roll
                     }
                     else if (data.game_state === 'WAITING_FOR_POST_ROLL_NARRATION') {
                         submitTextButton.style.display = 'inline-block';
+                        if (data.player_data[player_id].rerolls > 0) {
+                            rerollButton.style.display = 'inline-block';
+                        }
                         instructionsBox.textContent = 'Your turn is over! Narrate what happened! ' +
                             'As a reminder: ' + data.turn_results.join(", ");
                     }
